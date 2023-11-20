@@ -34,11 +34,9 @@ Revio system for the Genome in a Bottle Ashkenazi trio (child: HG002, father: HG
 
 ### Downsampling
 
-Create dummy uBAM sets (reads aligned to chr7 with 10X coverage) for workshop demo. The reasons to choose chr7 are:
+Create dummy uBAM sets (reads aligned to chr7 with 10X coverage) for workshop demo. The reasons of choosing chr7 are:
 1. Known copy number loss near centromere of chr7 in HG002.
 2. Known large-scale tandem repeats in chr7:
-
-PacBio WGS Analysis Pipeline can detect them.
 
 ```bash
 curl -O https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.trf.bed.gz
@@ -54,6 +52,9 @@ zcat hg38.trf.bed.gz | awk -F"\t" 'BEGIN{OFS="\t"}$1=="chr7"{print $1,$2,$3,$3-$
 # chr7	65503500	65505966	2466
 # chr7	65503513	65505975	2462
 ```
+
+PacBio WGS Analysis Pipeline can detect them.
+
 
 ```bash
 # download full HiFi bam files:
@@ -95,61 +96,9 @@ for bam in HG002-rep1.GRCh38.aligned.bam HG003-rep1.GRCh38.aligned.bam HG004-rep
 done
 ```
 
-<!--
-```bash
-cpus=4
-for bam in HG002-rep1.bam HG003-rep1.bam  HG004-rep1.bam; do
-    echo $bam ...
-
-    # build bam index (.pbi) for
-    # 1. fast random access
-    # 2. obtain information without processing entire BAM file
-    $pbindex $bam -j $cpus
-
-    # generate 3X data given the genome size of ~3.1 Gb
-    # determistic seed were used to make reproducible down-sampled reads set
-    $bamsieve \
-        -s 1234 \
-        --overall-coverage 3 \
-        --genome-size 3100000000 \
-        $bam \
-        ${bam%.bam}.3X.bam
-done
-
-# check coverage of down-sampled dataset
-runqc_report=$SMRT_ROOT/smrtcmds/bin/runqc-reports
-dataset=$SMRT_ROOT/smrtcmds/bin/dataset
-for bam in HG002-rep1.bam HG003-rep1.bam HG004-rep1.bam; do
-    echo ${bam%.bam}.3X.bam ... 
-
-    $dataset create --type ConsensusReadSet --generateIndices ${bam%.bam}.3X.ConsensusReadSet.xml ${bam%.bam}.3X.bam --force
-
-    mkdir -p ${bam%.bam}.3X.runqc_out
-    $runqc_report -o ${bam%.bam}.3X.runqc_out ${bam%.bam}.3X.ConsensusReadSet.xml 2>/dev/null | grep "HiFi Yield (bp)"
-done
-
-# output:
-# HG002-rep1.3X.bam ...
-#         HiFi Yield (bp)              : 9291671419
-# HG003-rep1.3X.bam ...
-#         HiFi Yield (bp)              : 9303592446
-# HG004-rep1.3X.bam ...
-#         HiFi Yield (bp)              : 9297736315
-
-echo "" | awk '{print 9291671419/3100000000}'
-# 2.99731
-echo "" | awk '{print 9303592446/3100000000}'
-# 3.00116
-echo "" | awk '{print 9297736315/3100000000}'
-# 2.99927
-```
--->
-
-The downsampled HiFi bams have already been put under your home directory `~/CUMED_BFX_workshop/01.wdl_humanwgs/data`.
+The downsampled HiFi bams have already been put under your home directory `~/CUMED_BFX_workshop/01.wdl_humanwgs/data`. Based on `mosdepth` summative output, overall coverage of chr7 is 10:
 
 ```bash
-# mosdepth summative output: overall coverage of chr7 is 10
-
 for f in *.GRCh38.aligned.chr7.10X.mosdepth_out.mosdepth.summary.txt; do
   echo $f
   cat $f
@@ -186,9 +135,9 @@ The whole dataset can be downloaded from PacBio public [DATASETS](https://www.pa
 -->
 
 
-## Pipeline execution walking-through using downsampled demo dataset
+## Pipeline execution walk-through using downsampled demo dataset
 
-PacBio WGS Variant Pipeline is created using [Workflow Description Language (WDL)](https://github.com/openwdl/wdl#workflow-description-language-wdl). As mentioned [here](https://github.com/openwdl/wdl#execution-engines), WDL is a workflow language which is not executable. Compliant executions engines supporting WDL are required. The WDL-based PacBio WGS Variant Pipeline are supported by two popular engines: [miniwdl and Cromwell](https://github.com/PacificBiosciences/HiFi-human-WGS-WDL#configuring-a-workflow-engine).
+PacBio WGS Variant Pipeline is created using [Workflow Description Language (WDL)](https://github.com/openwdl/wdl#workflow-description-language-wdl). WDL is a workflow language which is not executable. Compliant [executions engines](https://github.com/openwdl/wdl#execution-engines) supporting WDL are required. The WDL-based PacBio WGS Variant Pipeline are supported by two popular engines: [miniwdl and Cromwell](https://github.com/PacificBiosciences/HiFi-human-WGS-WDL#configuring-a-workflow-engine).
 
 In this workshop, `miniwdl` will be used for workflow execution due to its perfect usability.
 
@@ -356,7 +305,7 @@ dataset/
 
 ### Sample level analysis
 
-Run for each sample in the cohort. Aligns reads from each movie to the reference genome, then calls and phases small and structural variants.
+Run for each sample in the cohort. Align reads from each movie to the reference genome, then calls and phases small and structural variants.
 
 To enhance reproducibility, each step of the analysis was performed using [docker images](https://github.com/PacificBiosciences/wdl-dockerfiles), which are hosted in PacBio's [quay.io](https://quay.io/organization/pacbio).
 
@@ -364,13 +313,13 @@ Docker images and corresponding tool versions for current repo commit used for t
 
 To help BFX attendees understand better what the pipeline does for each step, i,e., which tool/command is invoked. We will do "hacked run": hack into the pipeline, run each analysis step using corresponding command lines with Singularity shell and pre-built docker image.
 
-#### 0. creating folder for hacked run of the pipeline
+#### 0. Creating folder for hacked run of the pipeline
 
 ```bash
 mkdir -p ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run
 ```
 
-#### 1. mapping HiFi reads to reference genome (GRCh38) 
+#### 1. Mapping HiFi reads to reference genome (GRCh38) 
 
 This step takes around 10 mins to finish. Unpatient attendees don't need to run this step by themselves, aligned bam is provided: `~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/HG002.GRCh38.chr7.10X.aligned.bam` for next step.
 
@@ -421,21 +370,13 @@ time pbmm2 align \
 
 Though down-sampled input HiFi reads are derived from reads mapping to chr7 in a full-set (30X) pbmm2 alignment to GRCh38 using same version of pbmm2: v1.10.0 (commit v1.10.0).
 
-<!--
-```
-@PG	ID:pbmm2	PN:pbmm2	VN:1.10.0 (commit v1.10.0)	CL:pbmm2 align --num-threads 24 --sort-memory 4G --preset HIFI --sample HG002 --log-level INFO --sort --unmapped /mnt/miniwdl_task_container/work/_miniwdl_inputs/0/human_GRCh38_no_alt_analysis_set.fasta /mnt/miniwdl_task_container/work/_miniwdl_inputs/0/m84011_220902_175841_s1.hifi_reads.bam HG002.m84011_220902_175841_s1.hifi_reads.GRCh38.aligned.bam
-```
--->
-
-Howerver, when we map down-sampled HiFi subset to GRCh38, still got ~3% of alignments mapped to other chromosomes, but most of them are supplemental alignments (`samtools view -f 2048`) or low quality alignments (`samtools view -f 0`), could be ignored. Only 356 alignments (`samtools view -f 16`) are primary. Out of them 177 are actually derived from chimeric alignments of long HiFi reads with other parts mapping to chr7 ("SA:Z:chr7").
+Howerver, when we mapped down-sampled HiFi subset to GRCh38, still got ~3% of alignments mapped to other chromosomes, but most of them are supplemental alignments (`samtools view -f 2048`) or low quality alignments (`samtools view -f 0`), could be ignored. Only 356 alignments (`samtools view -f 16`) are primary. Out of them 177 are actually derived from chimeric alignments of long HiFi reads with other parts mapping to chr7 ("SA:Z:chr7").
 
 `SA:Z:(rname,pos,strand,CIGAR,mapQ,NM;)+`:
-```
-Other canonical alignments in a chimeric alignment, formatted as a semicolon-delimited list. Each element in the list represents a part of the chimeric alignment. Conventionally, at a supplementary line, the first element points to the primary line. Strand is either ‘+’ or ‘-’, indicating forward/reverse strand, corresponding to FLAG bit 0x10. Pos is a 1-based
+>Other canonical alignments in a chimeric alignment, formatted as a semicolon-delimited list. Each element in the list represents a part of the chimeric alignment. Conventionally, at a supplementary line, the first element points to the primary line. Strand is either ‘+’ or ‘-’, indicating forward/reverse strand, corresponding to FLAG bit 0x10. Pos is a 1-based
 coordinate.
-```
 
-For remaining small number of non-chr7 alignments, reasons are unknown, but might be because of challenging (e.g., highly repeative) genome regions. As this dataset will be only used for demo purpose of how to run the pipeline and does not reflect the real use cases, therefore attendees could ignore those non-chr7 alignments for now. 
+For remaining small number of non-chr7 alignments, reasons are unknown, but might be because of challenging genome regions (e.g., highly repeative). As this dataset will be only used for demo purpose of how to run the pipeline and does not reflect the real use cases, therefore attendees could ignore those non-chr7 alignments for now.
 
 <!--
 
@@ -618,7 +559,7 @@ time awk '{{ print ($3>50?50:$3) "\t" $2; }}' \
 ```
 -->
 
-#### 2. Structural variants calling with `pbsv`
+#### 2. Calling structural variants with `pbsv`
 
 Pbsv uses two steps to call SVs in VCF format:
 1. `pbsv discover`: find SV signatures in read alignments (BAM to SVSIG)
@@ -668,9 +609,27 @@ bgzip /mnt/out/call_pbsv/HG002.GRCh38.chr7.10X.pbsv.vcf
 tabix -p vcf /mnt/out/call_pbsv/HG002.GRCh38.chr7.10X.pbsv.vcf.gz
 ```
 
-#### 3. combining all pbsv vcfs into one and indexing it using `bcftools index`
+Attendees could take a quick look at SV vcf in Bash shell:
 
-As we only have one vcf of chr7, therefore skip this step.
+```bash
+zless -S /mnt/out/call_pbsv/HG002.GRCh38.chr7.10X.pbsv.vcf.gz
+```
+
+And check specific SV using [IGV](https://igv.org/doc/desktop/#DownloadPage/). For example, we found there is a 21bp deletion in pbsv output vcf file:
+
+<p align="left">
+<img src="./img/chr7_del_vcf.svg" width="1000">
+</p>
+
+To visualize this deletion, we can download pbmm2 alignment: `/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_pbmm2/HG002.GRCh38.chr7.10X.aligned.bam` (including .bai index). After loading alignment bam into IGV and zooming in to the SV loci, we could spot the deletion:
+
+<p align="left">
+<img src="./img/chr7_del_igv.svg" width="680">
+</p>
+
+#### 3. Integrating all pbsv vcfs
+
+As we only have one vcf for chr7, therefore skip this step.
 
 ```bash
 # skip
@@ -697,16 +656,14 @@ As we only have one vcf of chr7, therefore skip this step.
 
 `make_examples` consumes reads and the reference genome to create TensorFlow examples for evaluation with the deep learning models.
 
-`make_examples` is a single-threaded program using 1-2 GB of RAM. Since the process of generating examples is embarrassingly parallel across the genome, make_examples supports sharding of its input and output via the `--task` argument with a sharded output specification. For example, if the output is specified as `--examples` examples.tfrecord@10.gz and `--task` 0, the input to the program will be 10% of the regions and the output will be written to examples.tfrecord-00000-of-00010.gz.
-
-The execution time for this step is ~30 mins on slim workshop servers (4 CPUs). This is long for this 1.5 hrs workshop, therefore two results folders: `example_tfrecords` and `nonvariant_site_tfrecords` for this step have been uploaded to demo run results folder: `~/CUMED_BFX_workshop/01.wdl_humanwgs/call_deepvariant/example_tfrecords.backup/` and  `~/CUMED_BFX_workshop/01.wdl_humanwgs/call_deepvariant/nonvariant_site_tfrecords.backup/`. To skip this step and continue with subsequent steps, attendees just need to update the results folders' name:
+`make_examples` is a **single-threaded program** using 1-2 GB of RAM. The execution time for the demo dataset is ~30 mins (even with `--regions "chr7"` to reduce the number of examples generated) on slim workshop servers (4 CPUs). This is long for this 1.5 hrs session, therefore two results folders: `example_tfrecords` and `nonvariant_site_tfrecords` for this step have been uploaded to demo run results folder: `~/CUMED_BFX_workshop/01.wdl_humanwgs/call_deepvariant/example_tfrecords.backup/` and  `~/CUMED_BFX_workshop/01.wdl_humanwgs/call_deepvariant/nonvariant_site_tfrecords.backup/`. To skip this step and continue with subsequent steps, attendees just need to update the results folders' name:
 
 ```bash
 ln -s ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/example_tfrecords.backup ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/example_tfrecords
 ln -s ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/nonvariant_site_tfrecords.backup ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/nonvariant_site_tfrecords
 ```
 
-Below is the `make_examples` commands used in the pipeline (of course, the number of shards and parallel jobs for a full Human WGS dataset, e.g., 30X dataset, will be larger and the pipeline does not need singularity shell for each command):
+To increase the level of parallelism, `make_examples` supports sharding of its input and output via the `--task` argument with a sharded output specification. Below is the `make_examples` commands used in the pipeline (of course, the number of shards and parallel jobs for a full Human WGS dataset, e.g., 30X dataset, will be larger and the pipeline does not need singularity shell for each command):
 
 ```bash
 # gcr.io/deepvariant-docker/deepvariant:1.5.0
@@ -718,41 +675,7 @@ singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 
 mkdir -p /mnt/out/call_deepvariant/example_tfrecords /mnt/out/call_deepvariant/nonvariant_site_tfrecords
 
-  --[no]realign_reads: If True, locally realign reads before calling variants.
-    Reads longer than 500 bp are never realigned.
-  --vsc_min_fraction_indels: Indel alleles occurring at least this fraction of
-    all counts in our AlleleCount will be advanced as candidates.
-    (default: '0.06')
-  --pileup_image_width: Width for the pileup image. If 0, uses the default width
-    (default: '0')
-  --[no]track_ref_reads: If True, allele counter keeps track of ref supporting
-    reads.By default allele counter keeps a simple count of number of reads
-    supporting ref.
-    (default: 'false')
-  --max_reads_per_partition: The maximum number of reads per partition that we
-    consider before following processing such as sampling and realigner.
-    (default: '1500')
-    (an integer)
-  --alt_aligned_pileup: <none|base_channels|diff_channels|rows>: Include
-    alignments of reads against each candidate alternate allele in the pileup
-    image. "none" turns this feature off. The default is "none".Options: "none",
-    "base_channels","diff_channels", "rows"
-    (default: 'none')
-  --[no]add_hp_channel: If true, add another channel to represent HP tags per
-    read.
-    (default: 'false')
-  --[no]parse_sam_aux_fields: If True, auxiliary fields of the SAM/BAM/CRAM
-    records are parsed. By default this flag is None. This flag will be
-    automatically turned on if other flags need it (e.g., sort_by_haplotypes).
-    If it is explicitly set by the user (either True or False), the user-
-    specified value will be used.
-  --min_mapping_quality: Setting this field to a positive integer i will only
-    keep reads thathave a MAPQ >= i. Note this only applies to aligned reads.
-    (default: '5')
-    (an integer)
-  --mode: Mode to run. Must be one of calling, training or candidate_sweep
-
-# add --regions "chr7" for this demo dataset
+# add --regions "chr7" for this demo dataset to reduce the number of TensorFlow examples generated
 time seq 0 15 | parallel --jobs 4 /opt/deepvariant/bin/make_examples \
 	--norealign_reads \
 	--vsc_min_fraction_indels 0.12 \
@@ -818,17 +741,32 @@ time /opt/deepvariant/bin/postprocess_variants \
 # sys	0m1.691s
 ```
 
+Similarly, attendees could view deepvariant output VCF:
+
+```bash
+cd /home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant
+zless -S HG002.GRCh38.deepvariant.vcf.gz
+```
+
+And check specific variant in IGV. E.g.:
+
+<p align="left">
+<img src="./img/chr7_snp_vcf.svg" width="1000">
+</p>
+
+<p align="left">
+<img src="./img/chr7_snp_igv.svg" width="680">
+</p>
+
 #### 5. bcftools `stats` and `roh`
 
 `bcftools stats`
 
-About:   Parses VCF or BCF and produces stats which can be plotted using plot-vcfstats.
-         When two files are given, the program generates separate stats for intersection
-         and the complements. By default only sites are compared, -s/-S must given to include also sample columns.
+Parses VCF or BCF and produces stats which can be plotted using plot-vcfstats.
 
 `bcftools roh`
 
-About:   HMM model for detecting runs of autozygosity.
+HMM model for detecting runs of autozygosity.
 
 ```bash
 singularity pull bcftools.sif docker://quay.io/pacbio/bcftools@sha256:36d91d5710397b6d836ff87dd2a924cd02fdf2ea73607f303a8544fbac2e691f
@@ -872,6 +810,78 @@ awk -v OFS='\t' '$1=="RG" {{ print $3, $4, $5, $8 }}' \
 >> /mnt/out/call_bcftools/HG002.GRCh38.deepvariant.roh.bed
 ```
 
+`bcftools` comes with `plot-vcfstats` to view statistics generated by `bcftools stats`, which is included in the bcftools docker image:
+
+```bash
+singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
+-B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
+-B ${PWD}:/mnt/out bcftools.sif
+
+plot-vcfstats -h
+# About: Plots the output of "bcftools stats"
+# Usage: plot-vcfstats [OPTIONS] -p outdir file.chk ...
+# Options:
+#    -m, --merge                         Merge vcfstats files to STDOUT, skip plotting.
+#    -p, --prefix <dir>                  Output directory.
+#    -P, --no-PDF                        Skip the PDF creation step.
+#    -r, --rasterize                     Rasterize PDF images for fast rendering, the default and opposite of -v.
+#    -s, --sample-names                  Use sample names for xticks rather than numeric IDs.
+#    -t, --title <string>                Identify files by these titles in plots. Can be given multiple times.
+#    -T, --main-title <string>           Main title for the PDF.
+#    -v, --vectors                       Generate vector graphics for PDF images, the opposite of -r
+#    -h, -?, --help                      This help message.
+
+# Plot the stats
+plot-vcfstats -p /mnt/out/call_bcftools /mnt/out/call_bcftools/HG002.GRCh38.deepvariant.vcf.stats.txt
+```
+
+Above command generates plotting scripts of python3, docker image does not provide python3 to do the actual plotting, therefore need to run:
+
+```bash
+mamba create -n plot-vcfstats 
+mamba activate plot-vcfstats
+
+python3 --version
+# Python 3.10.12
+
+mamba install matplotlib pdflatex
+
+# The final looks can be customized by editing the generated
+# 'outdir/plot.py' script and re-running manually
+cd /home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_bcftools
+
+python3 plot.py 
+```
+
+A few meaningful plots for this single chr demo dataset:
+
+1. tstv_by_qual.0.png
+
+Ts/Tv (transition-to-transversion) ratio is around 2-2.10, which is expected for human across the whole genome.
+
+<p align="left">
+<img src="./img/tstv_by_qual.0.png" width="300">
+</p>
+
+2. indel_vaf.0.png
+
+An overview of alternative allele%.
+
+<p align="left">
+<img src="./img/indel_vaf.0.png" width="600">
+</p>
+
+
+3. depth.0.png
+
+The peak coverage of genotypes is ~10X which is consistent to demo dataset depth.
+
+<p align="left">
+<img src="./img/depth.0.png" width="300">
+</p>
+
+
+For more versatile vcf statistics visualization, attendees could try [vcfstats](https://github.com/pwwang/vcfstats).
 
 #### 6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`
 
@@ -911,6 +921,24 @@ for phased_vcf in /mnt/out/call_hiphase/HG002.GRCh38.deepvariant.phased.vcf.gz /
 done
 ```
 
+After HiPhase, HiFi reads in the demo dataset will be phased into two haplotypes based on variants called using deepvariant and pbsv. Phased reads/alignment: `/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_hiphase/HG002.GRCh38.chr7.10X.aligned.haplotagged.bam` can be visualized into IGV (group alignment using "HP" tag):
+
+<p align="left">
+<img src="./img/haplotagged_bam_igv.svg" width="1000">
+</p>
+
+_(top panel is unphased pbmm2 alignment, while bottom panel is phased alignment from HiPhase, there are two haplotypes 1 and 2 corresponding to bam tags: `HP:i:1` and `HP:i:2`, while the 3rd row is for unphased reads)_
+
+As PacBio HiFi reads have 5mC CpG probability info (MM and ML tags), therefore in IGV (version: 2.16.2), we could also color alignment based on based modification (5mC): red color indicates 5mC CpG probability is greater than 50%, while blue color means it is smaller than 50%.
+
+<p align="left">
+<img src="./img/haplotagged_bam_5mC_igv.svg" width="1000">
+</p>
+
+<p align="left">
+<img src="./img/haplotagged_bam_5mC_igv_how.svg" width="1000">
+</p>
+
 #### 7. Resolving highly homologous genes/paralogs with `paraphase`
 
 [Paraphase](https://github.com/PacificBiosciences/paraphase) is a  HiFi-based genotyper for highly homologous genes falling into the challenging segmental duplication (SD) regions of human genome.
@@ -936,6 +964,24 @@ time paraphase \
 # user	0m26.385s
 # sys	0m9.779s
 ```
+
+Among disease-related genes covered by Paraphase, PMS2 (Lynch syndrome/hereditary nonpolyposis colorectal cancer) falls into chr7. Attendees could download Paraphase output bam `/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_paraphase/HG002.paraphase/HG002_realigned_tagged.bam` to view haplotypes of PMS2 and its highly homologus paralog PMS2CL in IGV (alignments grouped by HP tag):
+
+<p align="left">
+<img src="./img/paraphase_pms2_igv.svg" width="1000">
+</p>
+
+For detailed paraphase output `/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_paraphase/HG002.paraphase/HG002.json`
+
+```bash
+less -S /home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_paraphase/HG002.paraphase/HG002.json
+```
+
+Including copy numbers, final haplotypes for pms2 and its paralog pms2cl, variants used for paraphase phasing, etc.:
+
+<p align="left">
+<img src="./img/paraphase_json.svg" width="1000">
+</p>
 
 #### 8. Tandem repeats genotyper (TRGT)
 
@@ -987,6 +1033,7 @@ trgt --version
 
 mkdir -p /mnt/out/call_trgt
 
+# check drop outs, in this demo, all chrs but chr7 will be drop-outs
 time check_trgt_coverage.py \
 	/mnt/dataset/GRCh38/trgt/human_GRCh38_no_alt_analysis_set.trgt.v0.5.0.bed \
 	/mnt/out/call_hiphase/HG002.GRCh38.chr7.10X.aligned.haplotagged.bam \
@@ -997,11 +1044,15 @@ time check_trgt_coverage.py \
 # sys	0m9.791s
 
 # --karyotype XY as HG002 is male 
+# confine to repeats within chr7
+
+awk -F"\t" '$1=="chr7"' /mnt/dataset/GRCh38/trgt/human_GRCh38_no_alt_analysis_set.trgt.v0.5.0.bed > /mnt/out/call_trgt/human_GRCh38_no_alt_analysis_set.trgt.v0.5.0.chr7.bed
+
 time trgt \
 	--threads 4 \
 	--karyotype XY \
 	--genome /mnt/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta \
-	--repeats /mnt/dataset/GRCh38/trgt/human_GRCh38_no_alt_analysis_set.trgt.v0.5.0.bed \
+	--repeats /mnt/out/call_trgt/human_GRCh38_no_alt_analysis_set.trgt.v0.5.0.chr7.bed \
 	--reads /mnt/out/call_hiphase/HG002.GRCh38.chr7.10X.aligned.haplotagged.bam \
 	--output-prefix /mnt/out/call_trgt/HG002.GRCh38.chr7.10X.aligned.haplotagged.trgt
 
@@ -1077,6 +1128,32 @@ time samtools index \
 # sys	0m0.014s
 ```
 
+Next, we try to visualize tandem repeats variants identified by TRGT (`/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_trgt/HG002.GRCh38.chr7.10X.aligned.haplotagged.trgt.sorted.vcf.gz`) with TRVZ, the visualization tool acompanied with TRGT (still use same singularity shell).
+
+```bash
+zless -S /home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_trgt/HG002.GRCh38.chr7.10X.aligned.haplotagged.trgt.sorted.vcf.gz
+
+trvz --version
+# trvz 0.5.0-a70fa16
+
+trvz --genome /mnt/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta \
+--repeats /mnt/dataset/GRCh38/trgt/human_GRCh38_no_alt_analysis_set.trgt.v0.5.0.bed \
+--vcf /mnt/out/call_trgt/HG002.GRCh38.chr7.10X.aligned.haplotagged.trgt.sorted.vcf.gz \
+--spanning-reads /mnt/out/call_trgt/HG002.GRCh38.chr7.10X.aligned.haplotagged.trgt.spanning.sorted.bam \
+--repeat-id "chr7_472858_472888" \
+--image /mnt/out/call_trgt/chr7_472858_472888.trvz.svg
+```
+
+<p align="left">
+<img src="./img/chr7_472858_472888_trgt_vcf.svg" width="1000">
+</p>
+
+<p align="left">
+<img src="./img/chr7_472858_472888.trvz.svg" width="1000">
+</p>
+
+From TRVZ plot we could spot shorter tandem repeats: (TTTTTA)4 comparing to reference: (TTTTTA)5.
+
 #### 9. Calculating 5mC CpG methylation probabilities
 
 Propabilities for 5mC methylation of CpG sites can be calculated using `aligned_bam_to_cpg_scores` of [pb-CpG-tools](https://github.com/PacificBiosciences/pb-CpG-tools).
@@ -1112,6 +1189,14 @@ time aligned_bam_to_cpg_scores \
 # sys	0m8.469s
 ```
 
+Track files (.bw: bigWig) of pb-CpG-tools could be visualized in IGV:
+
+<p align="left">
+<img src="./img/chr7_cpgtools_igv.svg" width="1000">
+</p>
+
+
+
 #### 10. Getting reference genome coverage
 
 Use [mosdepth](https://github.com/brentp/mosdepth) to get reference genome coverage after `pbmm2` alignment.
@@ -1140,6 +1225,14 @@ time mosdepth \
 # sys	0m2.085s
 ```
 
+As expected, only chr7 has ~10X coverage: 
+
+```bash
+awk -F"\t" 'NR==1 || $1=="chr7"' ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_mosdepth/HG002.GRCh38.chr7.10X.aligned.haplotagged.mosdepth.summary.txt | column -t
+# chrom  length     bases       mean  min  max
+# chr7   159345973  1589288431  9.97  0    126
+```
+
 #### 11. Copy number variant (CNV) calling with HiFiCNV.
 
 [HiFiCNV](https://github.com/PacificBiosciences/HiFiCNV) is a CNV caller optimized for HiFi reads.
@@ -1155,21 +1248,52 @@ hificnv --version
 # hificnv 0.1.7-70e9988
 
 mkdir -p /mnt/out/call_hificnv
+
+# exclude all chrs but chr7
+awk -F"\t" 'BEGIN{OFS="\t"}$1!="chr7"{print $1,0,$2}' /mnt/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta.fai > /mnt/out/call_hificnv/excluded_regions_but_chr7.bed
+
 time hificnv \
 	--threads 4 \
 	--bam /mnt/out/call_hiphase/HG002.GRCh38.chr7.10X.aligned.haplotagged.bam \
 	--ref /mnt/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta \
 	--maf /mnt/out/call_hiphase/HG002.GRCh38.deepvariant.phased.vcf.gz \
-	--exclude /mnt/dataset/GRCh38/hificnv/cnv.excluded_regions.common_50.hg38.bed.gz \
+	--exclude /mnt/out/call_hificnv/excluded_regions_but_chr7.bed \
 	--expected-cn /mnt/dataset/GRCh38/hificnv/expected_cn.hg38.XY.bed \
 	--output-prefix /mnt/out/call_hificnv/hificnv
 
-# real	2m47.653s
-# user	2m47.342s
-# sys	0m3.620s
+# real	6m50.423s
+# user	2m31.485s
+# sys	0m4.932s
 ```
 
-HiFiCNV excluded regions included in `dataset/` folder were built with following scripts (done already):
+With above HiFiCNV commands, we could detect a few copy number loss in chr7 centromere (though they are all "IMPRECISE" due to shallow coverage):
+
+```bash
+# centromere of chr7
+# https://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cytoBand.txt.gz
+# chr7    58100000        60100000        p11.1   acen
+# chr7    60100000        62100000        q11.1   acen
+
+echo -e "chr7\t58100000\t62100000" | bedtools intersect -a <(zcat ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_hificnv/hificnv.HG002.vcf.gz) -b stdin | awk -F"\t" '$7=="PASS"'
+# chr7	58262001	.	N	<DEL>	72	PASS	IMPRECISE;SVTYPE=DEL;END=58376000;SVLEN=114000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:1
+# chr7	58398001	.	N	<DEL>	7	PASS	IMPRECISE;SVTYPE=DEL;END=58648000;SVLEN=250000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:1
+# chr7	58698001	.	N	<DEL>	52	PASS	IMPRECISE;SVTYPE=DEL;END=59178000;SVLEN=480000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:1
+# chr7	59200001	.	N	<DEL>	52	PASS	IMPRECISE;SVTYPE=DEL;END=59358000;SVLEN=158000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:1
+# chr7	59388001	.	N	<DEL>	81	PASS	IMPRECISE;SVTYPE=DEL;END=59918000;SVLEN=530000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:1
+# chr7	60002001	.	N	<DEL>	7	PASS	IMPRECISE;SVTYPE=DEL;END=60138000;SVLEN=136000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:1
+# chr7	60158001	.	N	<DEL>	60	PASS	IMPRECISE;SVTYPE=DEL;END=60536000;SVLEN=378000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:1
+# chr7	60602001	.	N	<DEL>	60	PASS	IMPRECISE;SVTYPE=DEL;END=60818000;SVLEN=216000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:1
+# chr7	61426001	.	N	<DEL>	92	PASS	IMPRECISE;SVTYPE=DEL;END=61594000;SVLEN=168000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:0
+# chr7	61964001	.	N	<DEL>	62	PASS	IMPRECISE;SVTYPE=DEL;END=62102000;SVLEN=138000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:0
+```
+
+When we visualize them in IGV (e.g., the first one in above CNV list, "red" region in IGV cytoband), we did see the drop of coverage and minor allele frequecy (given the deepvariant variants provided):
+
+<p align="left">
+<img src="./img/hificnv_chr7_loss.svg" width="1000">
+</p>
+
+As a side note, for above demo, we excluded all chrs but chr7 in HiFiCNV calling, but the pipeline use a more comprehensive excluded regions by default. HiFiCNV excluded regions included in `dataset/` folder were built with following scripts (done already):
 
 ```bash
 # Download excluded regions and expected copy number BED files for hificnv
@@ -1179,6 +1303,7 @@ wget -q https://raw.githubusercontent.com/PacificBiosciences/HiFiCNV/v${VER}/dat
 wget -q https://raw.githubusercontent.com/PacificBiosciences/HiFiCNV/v${VER}/data/expected_cn/expected_cn.hg38.XX.bed
 wget -q https://raw.githubusercontent.com/PacificBiosciences/HiFiCNV/v${VER}/data/expected_cn/expected_cn.hg38.XY.bed
 ```
+
 
 ### Cohort analysis
 
@@ -2152,9 +2277,8 @@ git push -u origin main
 ```
 -->
 
+<!--
 ### Key outputs
-
-(TODO: briefing)
 
 ```bash
 tree -dL 1 out
@@ -2199,4 +2323,4 @@ out
 
 37 directories
 ```
-
+-->

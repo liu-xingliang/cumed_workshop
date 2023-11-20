@@ -223,7 +223,7 @@ sbatch workflow/run_snakemake_SLmapped.sh $batch_name /home/xliu/CUMED_BFX_works
 
 ### Step-by-step execution of pipeline key steps (hacked run)
 
-Use NA02016 sample as example.
+Use NA02016 as an example.
 
 #### pbsv
 
@@ -322,6 +322,8 @@ time bcftools stats --threads 4 --fasta-ref /home/ubuntu/CUMED_BFX_workshop/03.s
 ```
 
 #### whatshap
+
+TE pipeline still uss whatshap for (small) variants phasing.
 
 ```bash
 mamba env create -n TE.whatshap --file ../snakemake_run/workflow/rules/envs/whatshap.yaml

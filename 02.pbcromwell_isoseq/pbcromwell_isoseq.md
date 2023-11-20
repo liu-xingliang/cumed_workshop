@@ -507,6 +507,13 @@ time pigeon report \
 # sys	0m0.038s
 ```
 
+At last, let's view transcripts consensus derived from `isoseq cluster2` mapping to reference genome (`~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2/mapped.bam`) and final pigeon isoform classification `~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/isoseq_classification.filtered_lite_classification.txt` in IGV. Here, we use USP25, a >150k bp gene as example, some consensus derived from `isoseq cluster2`: isoform sequences can fully cover the whole genes and all exons.
+
+<p align="left">
+<img src="./img/cluster2_bam_pigeon_isoforms_igv.svg" width="1000">
+</p>
+
+
 ### Executing Iso-Seq workflow using `pbcromwell`
 
 The whole workflow is built with WDL, hence can be executed using [Cromwell](https://github.com/broadinstitute/cromwell) engine. 
