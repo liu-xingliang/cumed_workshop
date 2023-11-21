@@ -229,6 +229,8 @@ cat fl_transcripts.lima.summary
 
 ### Trimming polyA tails with `isoseq refine` 
 
+`isoseq refine` trims polyA tails of cDNA sequences and generates [FLNC: full-length non-concatemer reads](https://isoseq.how/clustering/cli-workflow.html#step-3---refine).
+
 ```bash
 mkdir -p ~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_refine
 cd ~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_refine
@@ -291,6 +293,66 @@ python3 -m pbcoretools.tasks.memory.get_dataset_size \
   flnc_ccs_all_samples.consensusreadset.xml \
   --skip-counts \
   --get-index-size
+```
+
+Output of `isoseq refine` is located at: `~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_refine`. Attendees could check output files, e.g.:
+
+1. `flnc.filter_summary.report.json` for relevant numbers:
+
+```json
+{
+    "_comment": "Created by pbcopper v2.4.0",
+    "attributes": [
+        {
+            "id": "sample_name",
+            "name": "Sample Name",
+            "value": "BioSample_1"
+        },
+        {
+            "id": "num_reads_fl",
+            "name": "Full-Length Reads",
+            "value": 302453
+        },
+        {
+            "id": "num_reads_flnc",
+            "name": "Full-Length Non-Chimeric Reads",
+            "value": 301733
+        },
+        {
+            "id": "num_reads_flnc_polya",
+            "name": "Full-Length Non-Chimeric Reads with Poly-A Tail",
+            "value": 301515
+        }
+    ],
+    "dataset_uuids": [],
+    "id": "isoseq_refine",
+    "plotGroups": [],
+    "tables": [],
+    "title": "Iso-Seq Refine Report",
+    "uuid": "b2d461c9-924b-496d-81db-11816699243c",
+    "version": "1.0.1"
+}
+```
+
+2. `fulllength_nonconcatemer_readlength_hist.png`, for finalized FLNC read length distribution.
+
+<p align="left">
+<img src="./img/fulllength_nonconcatemer_readlength_hist.png" width="600">
+</p>
+
+3. `flnc.report.csv`, for detailed per-read profile.
+
+```
+id,strand,fivelen,threelen,polyAlen,insertlen,primer
+m84041_231023_043708_s4/234885674/ccs/15167_16570,+,6,6,30,1403,IsoSeqX_bc01_5p--IsoSeqX_3p
+m84041_231023_043708_s4/234884455/ccs/17581_20379,+,6,6,105,2798,IsoSeqX_bc01_5p--IsoSeqX_3p
+m84041_231023_043708_s4/246027830/ccs/4806_8003,+,6,3,27,3197,IsoSeqX_bc01_5p--IsoSeqX_3p
+m84041_231023_043708_s4/251662086/ccs/5543_8309,+,6,6,30,2766,IsoSeqX_bc01_5p--IsoSeqX_3p
+m84041_231023_043708_s4/251661925/ccs/4818_7598,+,6,6,29,2780,IsoSeqX_bc01_5p--IsoSeqX_3p
+m84041_231023_043708_s4/251662345/ccs/14716_18685,+,6,6,32,3969,IsoSeqX_bc01_5p--IsoSeqX_3p
+m84041_231023_043708_s4/251662771/ccs/9842_11533,+,6,6,33,1691,IsoSeqX_bc01_5p--IsoSeqX_3p
+m84041_231023_043708_s4/251662239/ccs/12711_14772,+,6,5,28,2061,IsoSeqX_bc01_5p--IsoSeqX_3p
+...
 ```
 
 ### Generating transcripts consensus with `isoseq cluster2`
@@ -404,6 +466,13 @@ time pbmm2 align \
 # sys	0m34.101s
 ```
 
+Let's view transcripts consensus derived from `isoseq cluster2` mapping (pbmm2) to reference genome (`~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2/mapped.bam`) in IGV. Here, we use USP25, a >150k bp gene as example, there are multiple consensus are similar/identical, indicating over-splitted clusters (will be merged in `isoseq collapse`).
+
+<p align="left">
+<img src="./img/cluster2_mapped_bam_igv.svg" width="1000">
+</p>
+
+
 ### Merging transcripts consensus derived from same isoform with `isoseq collapse` 
 
 After this step, Iso-Seq pipeline emit unique sequence for each full-length isoform.
@@ -507,12 +576,198 @@ time pigeon report \
 # sys	0m0.038s
 ```
 
-At last, let's view transcripts consensus derived from `isoseq cluster2` mapping to reference genome (`~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2/mapped.bam`) and final pigeon isoform classification `~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/isoseq_classification.filtered_lite_classification.txt` in IGV. Here, we use USP25, a >150k bp gene as example, some consensus derived from `isoseq cluster2`: isoform sequences can fully cover the whole genes and all exons.
+Final pigeon output classification file is located at `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/isoseq_classification.filtered_lite_classification.txt`, with columns and example values in below table (a FSM isoform with alternative Transcription Start Site (TSS) and Transcription Termination Site (TTS) with column "subcategory": "alternative_3end5end" and "diff_to_TSS" and "diff_to_TTS" values provided. "fl_assoc" column keeps the number of reads (FLNC PacBio HiFi reads) supporting this isoform. For more info, please refer to SQANTI3 [docs](https://github.com/ConesaLab/SQANTI3/wiki/Understanding-the-output-of-SQANTI3-QC#glossary-of-classification-file-columns-classificationtxt).
 
-<p align="left">
-<img src="./img/cluster2_bam_pigeon_isoforms_igv.svg" width="1000">
-</p>
+|columns|example_value|
+|---|---|
+|isoform|PB.1.1|
+|chrom|chr2|
+|strand|-|
+|length|1525|
+|exons|9|
+|structural_category|full-splice_match|
+|associated_gene|MEMO1|
+|associated_transcript|ENST00000295065.9|
+|ref_length|4505|
+|ref_exons|9|
+|diff_to_TSS|213|
+|diff_to_TTS|2767|
+|diff_to_gene_TSS|31|
+|diff_to_gene_TTS|0|
+|subcategory|alternative_3end5end|
+|RTS_stage|FALSE|
+|all_canonical|canonical|
+|min_sample_cov|NA|
+|min_cov|NA|
+|min_cov_pos|NA|
+|sd_cov|NA|
+|FL.BioSample_1|3|
+|FL_TPM.BioSample_1|12.665816|
+|FL_TPM.BioSample_1_log10|1.102633|
+|n_indels|NA|
+|n_indels_junc|NA|
+|bite|FALSE|
+|iso_exp|NA|
+|gene_exp|NA|
+|ratio_exp|NA|
+|FSM_class|A|
+|coding|non_coding|
+|ORF_length|NA|
+|CDS_length|NA|
+|CDS_start|NA|
+|CDS_end|NA|
+|CDS_genomic_start|NA|
+|CDS_genomic_end|NA|
+|predicted_NMD|NA|
+|perc_A_downstream_TTS|45|
+|seq_A_downstream_TTS|AAAATAGTCTGATTTAAACT|
+|dist_to_CAGE_peak|668|
+|within_CAGE_peak|FALSE|
+|dist_to_polyA_site|NA|
+|within_polyA_site|NA|
+|polyA_motif|NA|
+|polyA_dist|NA|
+|polyA_motif_found|NA|
+|ORF_seq|NA|
+|ratio_TSS|NA|
+|fl_assoc|3|
+|cell_barcodes|NA|
 
+
+Attendees could view pigeon output JSON file: `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/isoseq_classification.filtered.report.json` for more useful numbers:
+
+```json
+{
+    "_comment": "Created by pbcopper v2.4.0",
+    "attributes": [],
+    "dataset_uuids": [],
+    "id": "classification_summary",
+    "plotGroups": [],
+    "tables": [
+        {
+            "columns": [
+                {
+                    "header": "Sample Name",
+                    "id": "sample_name",
+                    "values": [
+                        "BioSample_1"
+                    ]
+                },
+                {
+                    "header": "Total Unique Genes",
+                    "id": "total_unique_genes",
+                    "values": [
+                        370
+                    ]
+                },
+                {
+                    "header": "Total Unique Genes, known genes only",
+                    "id": "total_unique_genes_known",
+                    "values": [
+                        280
+                    ]
+                },
+                {
+                    "header": "Total Unique Transcripts",
+                    "id": "total_unique_transcripts",
+                    "values": [
+                        3439
+                    ]
+                },
+                {
+                    "header": "Total Unique Transcripts, known transcripts only",
+                    "id": "total_unique_transcripts_known",
+                    "values": [
+                        704
+                    ]
+                },
+                {
+                    "header": "FLNC Reads Mapped to Genome",
+                    "id": "flnc_mapped_genome",
+                    "values": [
+                        158235
+                    ]
+                },
+                {
+                    "header": "FLNC Reads Confidently Mapped to Transcriptome",
+                    "id": "flnc_mapped_transcriptome",
+                    "values": [
+                        157833
+                    ]
+                },
+                {
+                    "header": "FLNC Reads Confidently Mapped to Transcriptome, excluding ribomito",
+                    "id": "flnc_mapped_transcriptome_excluding_ribomito",
+                    "values": [
+                        157833
+                    ]
+                },
+                {
+                    "header": "Transcripts classified as Full-splice Matches (FSM)",
+                    "id": "transcripts_fsm",
+                    "values": [
+                        1460
+                    ]
+                },
+                {
+                    "header": "Transcripts classified as Incomplete-splice Matches (ISM)",
+                    "id": "transcripts_ism",
+                    "values": [
+                        2785
+                    ]
+                },
+                {
+                    "header": "Transcripts classified as Novel In Catalog (NIC)",
+                    "id": "transcripts_nic",
+                    "values": [
+                        1258
+                    ]
+                },
+                {
+                    "header": "Transcripts classified as Novel Not In Catalog (NNC)",
+                    "id": "transcripts_nnc",
+                    "values": [
+                        1313
+                    ]
+                },
+                {
+                    "header": "Percent of reads classified as Full-splice Matches (FSM)",
+                    "id": "percent_reads_fsm",
+                    "values": [
+                        69.25
+                    ]
+                },
+                {
+                    "header": "Percent of reads classified as Incomplete-splice Matches (ISM)",
+                    "id": "percent_reads_ism",
+                    "values": [
+                        20.11
+                    ]
+                },
+                {
+                    "header": "Percent of reads classified as Novel In Catalog (NIC)",
+                    "id": "percent_reads_nic",
+                    "values": [
+                        5.93
+                    ]
+                },
+                {
+                    "header": "Percent of reads classified as Novel Not In Catalog (NNC)",
+                    "id": "percent_reads_nnc",
+                    "values": [
+                        4.45
+                    ]
+                }
+            ],
+            "id": "classification_summary_by_sample",
+            "title": ""
+        }
+    ],
+    "title": "Pigeon Classification Summary",
+    "uuid": "8eda7b89-4482-4b4b-a9d3-d604437a8ba0",
+    "version": "1.0.1"
+}
+```
 
 ### Executing Iso-Seq workflow using `pbcromwell`
 

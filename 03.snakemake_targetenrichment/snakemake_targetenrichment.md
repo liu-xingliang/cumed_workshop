@@ -490,3 +490,5 @@ time /pharmcat/pharmcat \
     -reporterJson \
     -o pharmcat/
 ```
+
+Attendees could download `/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/hacked_run/pharmcat/NA02016.preprocessed.filtered.report.html` to view pharmacogenomics annotation from PharmCAT.
