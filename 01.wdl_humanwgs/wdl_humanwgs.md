@@ -1869,7 +1869,7 @@ The example `humanwgs.cohort` section would look like this:
   "samples": [
     {
       "sample_id": "HG002",
-      "movie_bams": ["/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG002-rep1.chr7.10X.bam"],
+      "movie_bams": ["/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG002-rep1.chr7.10X.bam"],
       "sex": "MALE",
       "affected": false,
       "father_id": "HG003",
@@ -1877,7 +1877,7 @@ The example `humanwgs.cohort` section would look like this:
     },
     {
       "sample_id": "HG003",
-      "movie_bams": ["/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG003-rep1.chr7.10X.bam"],
+      "movie_bams": ["/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG003-rep1.chr7.10X.bam"],
       "sex": "MALE",
       "affected": false,
       "father_id": null,
@@ -1885,7 +1885,7 @@ The example `humanwgs.cohort` section would look like this:
     },
     {
       "sample_id": "HG004",
-      "movie_bams": ["/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG004-rep1.chr7.10X.bam"],
+      "movie_bams": ["/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG004-rep1.chr7.10X.bam"],
       "sex": "FEMALE",
       "affected": false,
       "father_id": null,
@@ -1953,7 +1953,7 @@ In current demo, we only have chr7 data, therefore, update "pbsv_splits" file an
 ```json
 "humanwgs.reference": {
   ...
-  "pbsv_splits": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.pbsv_splits.chr7.json",
+  "pbsv_splits": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.pbsv_splits.chr7.json",
   ...
 }
 ```
@@ -1968,7 +1968,7 @@ In current demo, we only have chr7 data, therefore, update "pbsv_splits" file an
 ]
 ```
 
-Final full JSON input for cohort analysis of this workshop (update `/home/xliu` to your own home folder, do not use `~` for home folder):
+Final full JSON input for cohort analysis of this workshop (update `/home/ubuntu` to your own home folder, do not use `~` for home folder):
 
 ```json
 {
@@ -1978,7 +1978,7 @@ Final full JSON input for cohort analysis of this workshop (update `/home/xliu` 
     "samples": [
       {
         "sample_id": "HG002",
-        "movie_bams": ["/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG002-rep1.chr7.10X.bam"],
+        "movie_bams": ["/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG002-rep1.chr7.10X.bam"],
         "sex": "MALE",
         "affected": false,
         "father_id": "HG003",
@@ -1986,7 +1986,7 @@ Final full JSON input for cohort analysis of this workshop (update `/home/xliu` 
       },
       {
         "sample_id": "HG003",
-        "movie_bams": ["/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG003-rep1.chr7.10X.bam"],
+        "movie_bams": ["/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG003-rep1.chr7.10X.bam"],
         "sex": "MALE",
         "affected": false,
         "father_id": null,
@@ -1994,7 +1994,7 @@ Final full JSON input for cohort analysis of this workshop (update `/home/xliu` 
       },
       {
         "sample_id": "HG004",
-        "movie_bams": ["/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG004-rep1.chr7.10X.bam"],
+        "movie_bams": ["/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/data/HG004-rep1.chr7.10X.bam"],
         "sex": "FEMALE",
         "affected": false,
         "father_id": null,
@@ -2005,48 +2005,48 @@ Final full JSON input for cohort analysis of this workshop (update `/home/xliu` 
   "humanwgs.reference": {
     "name": "GRCh38",
     "fasta": {
-      "data": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta",
-      "data_index": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta.fai"
+      "data": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta",
+      "data_index": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta.fai"
     },
-    "pbsv_splits": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.pbsv_splits.chr7.json",
-    "tandem_repeat_bed": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.trf.bed",
-    "trgt_tandem_repeat_bed": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/trgt/human_GRCh38_no_alt_analysis_set.trgt.v0.3.4.bed",
+    "pbsv_splits": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.pbsv_splits.chr7.json",
+    "tandem_repeat_bed": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.trf.bed",
+    "trgt_tandem_repeat_bed": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/trgt/human_GRCh38_no_alt_analysis_set.trgt.v0.3.4.bed",
     "hificnv_exclude_bed": {
-      "data": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/hificnv/cnv.excluded_regions.common_50.hg38.bed.gz",
-      "data_index": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/hificnv/cnv.excluded_regions.common_50.hg38.bed.gz.tbi"
+      "data": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/hificnv/cnv.excluded_regions.common_50.hg38.bed.gz",
+      "data_index": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/hificnv/cnv.excluded_regions.common_50.hg38.bed.gz.tbi"
     },
-    "hificnv_expected_bed_male": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/hificnv/expected_cn.hg38.XY.bed",
-    "hificnv_expected_bed_female": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/hificnv/expected_cn.hg38.XX.bed",
-    "gnomad_af": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/slivar_gnotate/gnomad.hg38.v3.custom.v1.zip",
-    "hprc_af": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/slivar_gnotate/hprc.deepvariant.glnexus.hg38.v1.zip",
-    "gff": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/ensembl.GRCh38.101.reformatted.gff3.gz",
+    "hificnv_expected_bed_male": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/hificnv/expected_cn.hg38.XY.bed",
+    "hificnv_expected_bed_female": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/hificnv/expected_cn.hg38.XX.bed",
+    "gnomad_af": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/slivar_gnotate/gnomad.hg38.v3.custom.v1.zip",
+    "hprc_af": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/slivar_gnotate/hprc.deepvariant.glnexus.hg38.v1.zip",
+    "gff": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/ensembl.GRCh38.101.reformatted.gff3.gz",
     "population_vcfs": [
       {
-          "data": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/EEE_SV-Pop_1.ALL.sites.20181204.vcf.gz",
-          "data_index": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/EEE_SV-Pop_1.ALL.sites.20181204.vcf.gz.tbi"
+          "data": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/EEE_SV-Pop_1.ALL.sites.20181204.vcf.gz",
+          "data_index": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/EEE_SV-Pop_1.ALL.sites.20181204.vcf.gz.tbi"
       },
       {
-          "data": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/nstd166.GRCh38.variant_call.vcf.gz",
-          "data_index": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/nstd166.GRCh38.variant_call.vcf.gz.tbi"
+          "data": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/nstd166.GRCh38.variant_call.vcf.gz",
+          "data_index": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/nstd166.GRCh38.variant_call.vcf.gz.tbi"
       },
       {
-          "data": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/hprc.GRCh38.pbsv.vcf.gz",
-          "data_index": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/hprc.GRCh38.pbsv.vcf.gz.tbi"
+          "data": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/hprc.GRCh38.pbsv.vcf.gz",
+          "data_index": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/hprc.GRCh38.pbsv.vcf.gz.tbi"
       },
       {
-          "data": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/ont_sv_high_confidence_SVs.sorted.vcf.gz",
-          "data_index": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/ont_sv_high_confidence_SVs.sorted.vcf.gz.tbi"
+          "data": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/ont_sv_high_confidence_SVs.sorted.vcf.gz",
+          "data_index": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/GRCh38/sv_pop_vcfs/ont_sv_high_confidence_SVs.sorted.vcf.gz.tbi"
       }
     ]
   },
   "humanwgs.slivar_data": {
-    "slivar_js": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/slivar/slivar-functions.v0.2.8.js",
-    "hpo_terms": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/hpo/hpoTerms.txt",
-    "hpo_dag": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/hpo/hpoDag.txt",
-    "hpo_annotations": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/hpo/ensembl.hpoPhenotype.tsv",
-    "ensembl_to_hgnc": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/genes/ensembl.hgncSymbol.tsv",
-    "lof_lookup": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/slivar/lof_lookup.v2.1.1.txt",
-    "clinvar_lookup": "/home/xliu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/slivar/clinvar_gene_desc.20221214T183140.txt"
+    "slivar_js": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/slivar/slivar-functions.v0.2.8.js",
+    "hpo_terms": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/hpo/hpoTerms.txt",
+    "hpo_dag": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/hpo/hpoDag.txt",
+    "hpo_annotations": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/hpo/ensembl.hpoPhenotype.tsv",
+    "ensembl_to_hgnc": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/genes/ensembl.hgncSymbol.tsv",
+    "lof_lookup": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/slivar/lof_lookup.v2.1.1.txt",
+    "clinvar_lookup": "/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/dataset/slivar/clinvar_gene_desc.20221214T183140.txt"
   },
   "humanwgs.deepvariant_version": "1.5.0",
   "humanwgs.run_tertiary_analysis": true,
