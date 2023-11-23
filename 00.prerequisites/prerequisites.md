@@ -30,9 +30,7 @@ Workshop servers use Ubuntu 22.04 LTS with Xfce lightweight desktop env. After `
 
 For Windows users, please download putty/puttygen [binaries](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html):
 
-For X64 (64-bit x86) system (most user should use this one):
->https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe
->https://the.earth.li/~sgtatham/putty/latest/w64/puttygen.exe
+For X64 (64-bit x86) system (most user should use this one), please download: [putty](https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe) and [puttygen](https://the.earth.li/~sgtatham/putty/latest/w64/puttygen.exe)
 
 For other architecture, please find corresponding binaries [here](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).
 
@@ -93,7 +91,7 @@ Please follow the step-by-step instructions below:
 
 #### 3. Connecting to Ubuntu desktop using RealVNC
 
-Attendee could download a standalone binary of RealVNC client without installation (e.g., X64 system): https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Windows-64bit.exe. Other architectures, please check the [download page](https://www.realvnc.com/en/connect/download/viewer/windows/). While connecting to the remote server using VNC through "localhost:5901", please **keep the putty ssh session alive**.
+Attendee could download a standalone binary of RealVNC client without installation. E.g., X64 system should download [VNC-Viewer-7.8.0-Windows-64bit.exe](https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Windows-64bit.exe). Other architectures, please check the [download page](https://www.realvnc.com/en/connect/download/viewer/windows/). While connecting to the remote server using VNC through "localhost:5901", please **keep the putty ssh session alive**.
 
 <p align="left">
 <img src="./img/windows_vnc.svg" width="400">
