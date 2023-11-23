@@ -5,6 +5,49 @@ date: Monday, November 27, 2023
 duration: 90 minutes
 ---
 
+- [Workflow of PacBio WDL WGS Variant Analysis Pipeline](#workflow-of-pacbio-wdl-wgs-variant-analysis-pipeline)
+- [Understanding the demo dataset](#understanding-the-demo-dataset)
+	- [Downsampling](#downsampling)
+- [Pipeline execution walk-through using downsampled demo dataset](#pipeline-execution-walk-through-using-downsampled-demo-dataset)
+	- [Setting up Conda computing environment](#setting-up-conda-computing-environment)
+	- [Installing Singularity](#installing-singularity)
+	- [Downloading reference dataset](#downloading-reference-dataset)
+- [Key pipeline steps and output](#key-pipeline-steps-and-output)
+	- [Sample level analysis](#sample-level-analysis)
+		- [0. Creating folder for hacked run of the pipeline](#0-creating-folder-for-hacked-run-of-the-pipeline)
+		- [1. Mapping HiFi reads to reference genome (GRCh38)](#1-mapping-hifi-reads-to-reference-genome-grch38)
+		- [2. Calling structural variants with `pbsv`](#2-calling-structural-variants-with-pbsv)
+		- [3. Integrating all pbsv vcfs](#3-integrating-all-pbsv-vcfs)
+		- [4. deepvariant](#4-deepvariant)
+			- [make\_examples](#make_examples)
+			- [call\_variants (CPU only)](#call_variants-cpu-only)
+			- [postprocess\_variants](#postprocess_variants)
+		- [5. bcftools `stats` and `roh`](#5-bcftools-stats-and-roh)
+		- [6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`](#6-phasing-small-variants-snpsindels-and-svs-using-hiphase)
+		- [7. Resolving highly homologous genes/paralogs with `paraphase`](#7-resolving-highly-homologous-genesparalogs-with-paraphase)
+		- [8. Tandem repeats genotyper (TRGT)](#8-tandem-repeats-genotyper-trgt)
+		- [9. Calculating 5mC CpG methylation probabilities](#9-calculating-5mc-cpg-methylation-probabilities)
+		- [10. Getting reference genome coverage](#10-getting-reference-genome-coverage)
+		- [11. Copy number variant (CNV) calling with HiFiCNV.](#11-copy-number-variant-cnv-calling-with-hificnv)
+	- [Cohort analysis](#cohort-analysis)
+		- [1. Small variants joint calling with `glnexus`](#1-small-variants-joint-calling-with-glnexus)
+		- [2. Large-scale SVs joint-calling with `pbsv`](#2-large-scale-svs-joint-calling-with-pbsv)
+		- [bcftools concat](#bcftools-concat)
+		- [Phasing Joint variants calls with `hiphase`](#phasing-joint-variants-calls-with-hiphase)
+	- [Tertiary analysis](#tertiary-analysis)
+		- [write\_yaml\_ped\_phrank](#write_yaml_ped_phrank)
+		- [svpack\_filter\_annotated](#svpack_filter_annotated)
+		- [slivar\_svpack\_tsv](#slivar_svpack_tsv)
+		- [slivar\_small\_variant](#slivar_small_variant)
+- [Running pipeline using miniwdl and Slurm](#running-pipeline-using-miniwdl-and-slurm)
+	- [Downloading the github repository for latest version of pipeline](#downloading-the-github-repository-for-latest-version-of-pipeline)
+	- [Preparing input JSON file for the pipeline](#preparing-input-json-file-for-the-pipeline)
+	- [Splitted call of pbsv](#splitted-call-of-pbsv)
+	- [Executing pipeline using JMS (Slurm)](#executing-pipeline-using-jms-slurm)
+	- [Other notes](#other-notes)
+		- [Call cache](#call-cache)
+
+
 ### Learning Objectives:
 
 * Understand workflow of PacBio WDL WGS Variant Pipeline
@@ -615,7 +658,11 @@ Attendees could take a quick look at SV vcf in Bash shell:
 zless -S /mnt/out/call_pbsv/HG002.GRCh38.chr7.10X.pbsv.vcf.gz
 ```
 
-And check specific SV using [IGV](https://igv.org/doc/desktop/#DownloadPage/). For example, we found there is a 21bp deletion in pbsv output vcf file:
+And check specific SV using [IGV](https://igv.org/doc/desktop/#DownloadPage/). IGV has already been downloaded to your server, to lanuch IGV on the server:
+1. Double click "Xfce Terminal" on Desktop.
+2. In terminal, run `~/Desktop/IGV_Linux_2.16.2/igv.sh`.
+
+For example, we found there is a 21bp deletion in pbsv output vcf file:
 
 <p align="left">
 <img src="./img/chr7_del_vcf.svg" width="1000">
@@ -1467,8 +1514,8 @@ Annotate small and structural variant VCFs using slivar. Outputs annotated VCFs 
 
 Tertinary analysis will be skipped in this workshop but with pipeline commands provided for attendees' reference because:
 1. The demo trio (HG002-trio) are not "affected" samples, it's not necessary to run tertiary analysis for clinical annotation.
-2. Tertiary analysis need more senario-specific (e.g., disease-specific) results interpretation, which is not the goal of this workshop.
-3. Workshop time is limited.
+2. Tertiary analysis needs more senario-specific (e.g., disease-specific) results interpretation, which is not the goal of this workshop.
+3. Time is limited.
 
 #### write_yaml_ped_phrank
 

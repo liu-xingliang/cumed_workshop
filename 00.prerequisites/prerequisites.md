@@ -1,3 +1,17 @@
+- [AWS EC2 instance and key pairs](#aws-ec2-instance-and-key-pairs)
+- [Access workshop EC2 server (VNC + Ubuntu Xfce desktop)](#access-workshop-ec2-server-vnc--ubuntu-xfce-desktop)
+  - [Windows OS](#windows-os)
+    - [1. Coverting key pair (.pem) to Putty (.ppk) format](#1-coverting-key-pair-pem-to-putty-ppk-format)
+    - [2. Connecting to EC2 workshop server using Putty](#2-connecting-to-ec2-workshop-server-using-putty)
+    - [3. Connecting to Ubuntu desktop using RealVNC](#3-connecting-to-ubuntu-desktop-using-realvnc)
+  - [Linux/MacOS](#linuxmacos)
+    - [MacOS user VNC to EC2 server](#macos-user-vnc-to-ec2-server)
+    - [Linux user VNC to EC2 server](#linux-user-vnc-to-ec2-server)
+- [Pre-installed visualization tools for viewing pipeline results](#pre-installed-visualization-tools-for-viewing-pipeline-results)
+  - [`scp` for Linux/MacOS user](#scp-for-linuxmacos-user)
+  - [FileZilla client for Windows user](#filezilla-client-for-windows-user)
+
+
 ## AWS EC2 instance and key pairs
 
 This workshop will be conducted using [AWS EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html) instances. For each attendee, you will have your own EC2 instance with DNS name `server_$(printf "%03d" N).cumed-workshop.com`, where `N` is the rank on the registration list. E.g., if a attendee is ranked 1st on the list, the EC2 server assigned to him/her will be `server_001.cumed-workshop.com`. 

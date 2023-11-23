@@ -5,6 +5,22 @@ date: Monday, November 27, 2023
 duration: 60 minutes
 ---
 
+- [Learning Objectives:](#learning-objectives)
+- [Kinnex](#kinnex)
+- [Install SMRT Link v13 (EA)](#install-smrt-link-v13-ea)
+- [Pre-setting running environment](#pre-setting-running-environment)
+- [Demultiplexing HiFi reads](#demultiplexing-hifi-reads)
+- [Decatenating HiFi reads with `skera`](#decatenating-hifi-reads-with-skera)
+- [Downsampling segmented reads](#downsampling-segmented-reads)
+- [Trimming cDNA primer barcodes and amplicon demultiplexing](#trimming-cdna-primer-barcodes-and-amplicon-demultiplexing)
+- [Trimming polyA tails with `isoseq refine`](#trimming-polya-tails-with-isoseq-refine)
+- [Generating transcripts consensus with `isoseq cluster2`](#generating-transcripts-consensus-with-isoseq-cluster2)
+- [Mapping transcripts consensus to reference genome with `pbmm2`](#mapping-transcripts-consensus-to-reference-genome-with-pbmm2)
+- [Merging transcripts consensus derived from same isoform with `isoseq collapse`](#merging-transcripts-consensus-derived-from-same-isoform-with-isoseq-collapse)
+- [Isoform classification and filtering using `pigeon`](#isoform-classification-and-filtering-using-pigeon)
+- [Executing Iso-Seq workflow using `pbcromwell`](#executing-iso-seq-workflow-using-pbcromwell)
+
+
 ### Learning Objectives:
 
 * Understand key steps and main output of Iso-Seq pipeline for Kinnex bulk RNA seq

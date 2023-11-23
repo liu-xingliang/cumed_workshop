@@ -5,6 +5,18 @@ date: Monday, November 27, 2023
 duration: 60 minutes
 ---
 
+- [Learning Objectives:](#learning-objectives)
+- [Downsampling](#downsampling)
+- [Setting up run environment](#setting-up-run-environment)
+- [Preparing de-duplicated HiFi alignment](#preparing-de-duplicated-hifi-alignment)
+- [Running pipeline using Snakemake + Slurm](#running-pipeline-using-snakemake--slurm)
+- [Step-by-step execution of pipeline key steps (hacked run)](#step-by-step-execution-of-pipeline-key-steps-hacked-run)
+  - [pbsv](#pbsv)
+  - [deepvariant](#deepvariant)
+  - [whatshap](#whatshap)
+  - [pharmcat](#pharmcat)
+
+
 ### Learning Objectives:
 
 * Understand key steps and main output of PacBio HiFi target enrichment workflow
