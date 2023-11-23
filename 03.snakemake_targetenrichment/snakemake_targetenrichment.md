@@ -5,22 +5,36 @@ date: Monday, November 27, 2023
 duration: 60 minutes
 ---
 
-- [Learning Objectives:](#learning-objectives)
-- [Downsampling](#downsampling)
-- [Setting up run environment](#setting-up-run-environment)
-- [Preparing de-duplicated HiFi alignment](#preparing-de-duplicated-hifi-alignment)
-- [Running pipeline using Snakemake + Slurm](#running-pipeline-using-snakemake--slurm)
-- [Step-by-step execution of pipeline key steps (hacked run)](#step-by-step-execution-of-pipeline-key-steps-hacked-run)
-  - [pbsv](#pbsv)
-  - [deepvariant](#deepvariant)
-  - [whatshap](#whatshap)
-  - [pharmcat](#pharmcat)
-
-
 ### Learning Objectives:
 
 * Understand key steps and main output of PacBio HiFi target enrichment workflow
 * Understand how to run PacBio HiFi target enrichment workflow using Slurm job management system (JMS) on a high-performing computer (HPC)
+
+- [Setting up run environment](#setting-up-run-environment)
+- [Preparing de-duplicated HiFi alignment](#preparing-de-duplicated-hifi-alignment)
+  - [Downsampling](#downsampling)
+  - [Preparing de-duplicated HiFi alignment](#preparing-de-duplicated-hifi-alignment-1)
+- [Running pipeline using Snakemake + Slurm](#running-pipeline-using-snakemake--slurm)
+- [Step-by-step execution of pipeline key steps (hacked run)](#step-by-step-execution-of-pipeline-key-steps-hacked-run)
+  - [1. pbsv](#1-pbsv)
+  - [2. deepvariant](#2-deepvariant)
+  - [3. whatshap](#3-whatshap)
+  - [4. pharmcat](#4-pharmcat)
+
+## Setting up run environment
+
+```bash
+mamba create -n snakemake_targetenrichment \
+    --channel conda-forge \
+    --channel bioconda \
+    python=3.9 snakemake=7.32.4 pysam=0.22.0 lockfile=0.12.2 git=2.42.0 pbmarkdup=1.0.3 mosdepth=0.3.5 
+
+# for lockfile
+sudo apt update -y
+sudo apt install procmail -y
+```
+
+## Preparing de-duplicated HiFi alignment
 
 ### Downsampling
 
@@ -52,19 +66,6 @@ curl -O https://downloads.pacbcloud.com/public/dataset/HiFi_amplicon_CYP2D6/down
 curl -O https://downloads.pacbcloud.com/public/dataset/HiFi_amplicon_CYP2D6/downsampled/NA17276.bam
 curl -O https://downloads.pacbcloud.com/public/dataset/HiFi_amplicon_CYP2D6/downsampled/NA17282.bam
 curl -O https://downloads.pacbcloud.com/public/dataset/HiFi_amplicon_CYP2D6/downsampled/NA17300.bam
-```
-
-### Setting up run environment
-
-```bash
-mamba create -n snakemake_targetenrichment \
-    --channel conda-forge \
-    --channel bioconda \
-    python=3.9 snakemake=7.32.4 pysam=0.22.0 lockfile=0.12.2 git=2.42.0 pbmarkdup=1.0.3 mosdepth=0.3.5 
-
-# for lockfile
-sudo apt update -y
-sudo apt install procmail -y
 ```
 
 ### Preparing de-duplicated HiFi alignment
@@ -157,7 +158,7 @@ done
 |NA17300|chr22|42120672|42139664|18.63|
 
 
-### Running pipeline using Snakemake + Slurm
+## Running pipeline using Snakemake + Slurm
 
 PacBio HiFi target enrichment snakemake workflow is usually run with Slurm and due to slim computing resouces available on workshop servers, it will take time to finish. Therefore, we will not run this session but providing scripts for attendees' reference.
 
@@ -233,11 +234,11 @@ sbatch workflow/run_snakemake_SLmapped.sh $batch_name /home/xliu/CUMED_BFX_works
 ```
 -->
 
-### Step-by-step execution of pipeline key steps (hacked run)
+## Step-by-step execution of pipeline key steps (hacked run)
 
 Use NA02016 as an example.
 
-#### pbsv
+### 1. pbsv
 
 ```bash
 mamba env create -n TE.pbsv --file ../snakemake_run/workflow/rules/envs/pbsv.yaml
@@ -261,7 +262,7 @@ time pbsv call --hifi -m 20 --log-level INFO --num-threads 4 /home/ubuntu/CUMED_
 # sys	0m4.742s
 ```
 
-#### deepvariant
+### 2. deepvariant
 
 ```bash
 # gcr.io/deepvariant-docker/deepvariant:1.4.0
@@ -333,7 +334,7 @@ time bcftools stats --threads 4 --fasta-ref /home/ubuntu/CUMED_BFX_workshop/03.s
 # sys	0m0.016s
 ```
 
-#### whatshap
+### 3. whatshap
 
 TE pipeline still uss whatshap for (small) variants phasing.
 
@@ -466,7 +467,7 @@ time pangu -m capture -p pangu/NA02016/ ../snakemake_run/batches/CYP2D6_PGx_SQII
 ```
 -->
 
-#### pharmcat
+### 4. pharmcat
 
 ```bash
 singularity pull pharmcat.sif docker://pgkb/pharmcat:2.3.0

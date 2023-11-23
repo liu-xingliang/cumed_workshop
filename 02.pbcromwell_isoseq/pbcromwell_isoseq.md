@@ -5,28 +5,31 @@ date: Monday, November 27, 2023
 duration: 60 minutes
 ---
 
-- [Learning Objectives:](#learning-objectives)
-- [Kinnex](#kinnex)
-- [Install SMRT Link v13 (EA)](#install-smrt-link-v13-ea)
-- [Pre-setting running environment](#pre-setting-running-environment)
-- [Demultiplexing HiFi reads](#demultiplexing-hifi-reads)
-- [Decatenating HiFi reads with `skera`](#decatenating-hifi-reads-with-skera)
-- [Downsampling segmented reads](#downsampling-segmented-reads)
-- [Trimming cDNA primer barcodes and amplicon demultiplexing](#trimming-cdna-primer-barcodes-and-amplicon-demultiplexing)
-- [Trimming polyA tails with `isoseq refine`](#trimming-polya-tails-with-isoseq-refine)
-- [Generating transcripts consensus with `isoseq cluster2`](#generating-transcripts-consensus-with-isoseq-cluster2)
-- [Mapping transcripts consensus to reference genome with `pbmm2`](#mapping-transcripts-consensus-to-reference-genome-with-pbmm2)
-- [Merging transcripts consensus derived from same isoform with `isoseq collapse`](#merging-transcripts-consensus-derived-from-same-isoform-with-isoseq-collapse)
-- [Isoform classification and filtering using `pigeon`](#isoform-classification-and-filtering-using-pigeon)
-- [Executing Iso-Seq workflow using `pbcromwell`](#executing-iso-seq-workflow-using-pbcromwell)
-
-
 ### Learning Objectives:
 
 * Understand key steps and main output of Iso-Seq pipeline for Kinnex bulk RNA seq
 * Understand how to run Iso-Seq pipeline with `pbcromwell` on using Slurm job management system (JMS) on a high-performing computer (HPC)
 
-### Kinnex
+
+- [KinnexTM high-throughput RNA sequencing kit](#kinnextm-high-throughput-rna-sequencing-kit)
+- [Pre-setting running environment](#pre-setting-running-environment)
+  - [Installing SMRT Link v13 (EA)](#installing-smrt-link-v13-ea)
+  - [Updating system `$PATH`](#updating-system-path)
+- [Preparing demo dataset](#preparing-demo-dataset)
+  - [Demultiplexing HiFi reads](#demultiplexing-hifi-reads)
+  - [Decatenating HiFi reads with `skera`](#decatenating-hifi-reads-with-skera)
+  - [Downsampling segmented reads](#downsampling-segmented-reads)
+- [Key pipeline steps and output](#key-pipeline-steps-and-output)
+  - [1. Trimming cDNA primer barcodes and amplicon demultiplexing](#1-trimming-cdna-primer-barcodes-and-amplicon-demultiplexing)
+  - [2. Trimming polyA tails with `isoseq refine`](#2-trimming-polya-tails-with-isoseq-refine)
+  - [3. Generating transcripts consensus with `isoseq cluster2`](#3-generating-transcripts-consensus-with-isoseq-cluster2)
+  - [4. Mapping transcripts consensus to reference genome with `pbmm2`](#4-mapping-transcripts-consensus-to-reference-genome-with-pbmm2)
+  - [5. Merging transcripts consensus derived from same isoform with `isoseq collapse`](#5-merging-transcripts-consensus-derived-from-same-isoform-with-isoseq-collapse)
+  - [6. Isoform classification and filtering using `pigeon`](#6-isoform-classification-and-filtering-using-pigeon)
+- [Executing Iso-Seq workflow using `pbcromwell`](#executing-iso-seq-workflow-using-pbcromwell)
+
+
+## Kinnex<sup>TM</sup> high-throughput RNA sequencing kit
 
 [Kinnex RNA Kits](https://www.pacb.com/press_releases/pacbio-announces-kinnex-rna-kits-further-scaling-hifi-sequencing-in-full-length-rna-single-cell-rna-and-16s-rrna-applications/) 
 
@@ -48,7 +51,9 @@ mamba install pbpigeon=1.1.0
 ```
 -->
 
-### Install SMRT Link v13 (EA)
+## Pre-setting running environment
+
+### Installing SMRT Link v13 (EA)
 
 With full installation of SMRT Link, user could access all command line tools needed for this demo. Besides, instead of a full SMRT Link installation with user interface and other modules, user could opt to only install command line with:
 
@@ -59,7 +64,7 @@ export SMRT_ROOT=/home/ubuntu/softwares/smrtlink
 
 In this hands-on session, we only need command line tools of SMRT Link only.
 
-### Pre-setting running environment
+### Updating system `$PATH` 
 
 Add SMRT Link smrttools `bin` directory to $PATH env.
 
@@ -67,6 +72,8 @@ Add SMRT Link smrttools `bin` directory to $PATH env.
 export SMRT_ROOT=/home/ubuntu/softwares/smrtlink
 export PATH=$SMRT_ROOT/install/smrtlink-release_13.0.0.203030/bundles/smrttools/current/private/otherbins/all/bin:$PATH
 ```
+
+## Preparing demo dataset
 
 ### Demultiplexing HiFi reads
 
@@ -161,7 +168,9 @@ bd3a2e6be4c58903a09af818e1e244cccf01ded5  /dev/fd/62
 ```
 -->
 
-### Trimming cDNA primer barcodes and amplicon demultiplexing
+## Key pipeline steps and output
+
+### 1. Trimming cDNA primer barcodes and amplicon demultiplexing
 
 As mentioned above, multiplexing of Kinnex kit happens in two places. Besides Kinnex adapter, primers used for sample cDNA amplification were also barcoded. These barcodes also need to be trimmed for demultiplexing of cDNA amplicons (into different samples).
 
@@ -243,7 +252,7 @@ cat fl_transcripts.lima.summary
 # With different pair            : 302453
 ```
 
-### Trimming polyA tails with `isoseq refine` 
+### 2. Trimming polyA tails with `isoseq refine` 
 
 `isoseq refine` trims polyA tails of cDNA sequences and generates [FLNC: full-length non-concatemer reads](https://isoseq.how/clustering/cli-workflow.html#step-3---refine).
 
@@ -371,7 +380,7 @@ m84041_231023_043708_s4/251662239/ccs/12711_14772,+,6,5,28,2061,IsoSeqX_bc01_5p-
 ...
 ```
 
-### Generating transcripts consensus with `isoseq cluster2`
+### 3. Generating transcripts consensus with `isoseq cluster2`
 
 Comparing to its predecessor, `isoseq cluster2` is a memory-efficient alternative supporting high-throughput input of Kinnex FL RNA sequencing.
 
@@ -458,7 +467,7 @@ time python3 -m pbreports.report.isoseq \
 # sys	0m0.178s
 ```
 
-### Mapping transcripts consensus to reference genome with `pbmm2` 
+### 4. Mapping transcripts consensus to reference genome with `pbmm2` 
 
 This step comes before `isoseq collapse` for collapsing multiple transcripts consensus derived from same isoform. `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/Human_hg38_Gencode_v39/` is the reference dataset comes together with SMRT Link (need to be installed).
 
@@ -489,7 +498,7 @@ Let's view transcripts consensus derived from `isoseq cluster2` mapping (pbmm2) 
 </p>
 
 
-### Merging transcripts consensus derived from same isoform with `isoseq collapse` 
+### 5. Merging transcripts consensus derived from same isoform with `isoseq collapse` 
 
 After this step, Iso-Seq pipeline emit unique sequence for each full-length isoform.
 
@@ -514,7 +523,7 @@ time isoseq collapse \
 # sys	0m0.737s
 ```
 
-### Isoform classification and filtering using `pigeon`
+### 6. Isoform classification and filtering using `pigeon`
 
 After generating full-length isoform sequences, we use [pigeon](https://isoseq.how/classification/pigeon.html) to classify isoform based on their matching file to known isoforms and exclude low quality isoforms. Pigeon is based off [SQANTI3](https://github.com/ConesaLab/SQANTI3).
 
@@ -785,7 +794,7 @@ Attendees could view pigeon output JSON file: `/home/ubuntu/CUMED_BFX_workshop/0
 }
 ```
 
-### Executing Iso-Seq workflow using `pbcromwell`
+## Executing Iso-Seq workflow using `pbcromwell`
 
 The whole workflow is built with WDL, hence can be executed using [Cromwell](https://github.com/broadinstitute/cromwell) engine. 
 

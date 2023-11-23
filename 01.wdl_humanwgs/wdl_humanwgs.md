@@ -5,6 +5,13 @@ date: Monday, November 27, 2023
 duration: 90 minutes
 ---
 
+### Learning Objectives:
+
+* Understand workflow of PacBio WDL WGS Variant Pipeline
+* Understand key steps and main outputs of the pipeline 
+* Understand how to prepare input (JSON) file and miniwdl configuration files for running the pipeline using Slurm job management system (JMS) on a high-performing computer (HPC)
+
+
 - [Workflow of PacBio WDL WGS Variant Analysis Pipeline](#workflow-of-pacbio-wdl-wgs-variant-analysis-pipeline)
 - [Understanding the demo dataset](#understanding-the-demo-dataset)
 	- [Downsampling](#downsampling)
@@ -48,11 +55,6 @@ duration: 90 minutes
 		- [Call cache](#call-cache)
 
 
-### Learning Objectives:
-
-* Understand workflow of PacBio WDL WGS Variant Pipeline
-* Understand key steps and main outputs of the pipeline 
-* Understand how to prepare input (JSON) file and miniwdl configuration files for running the pipeline using Slurm job management system (JMS) on a high-performing computer (HPC)
 
 ## Workflow of PacBio WDL WGS Variant Analysis Pipeline
 
