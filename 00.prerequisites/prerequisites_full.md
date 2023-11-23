@@ -14,7 +14,7 @@
 
 ## AWS EC2 instance and key pairs
 
-This workshop will be conducted using [AWS EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html) instances. For each attendee, you will have your own EC2 instance with DNS name `server_$(printf "%03d" N).cumed-workshop.com`, where `N` is the rank on the registration list. E.g., if a attendee is ranked 1st on the list, the EC2 server assigned to him/her will be `server_001.cumed-workshop.com`. 
+This workshop will be conducted using [AWS EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html) instances. For each attendee, you will have your own EC2 instance with DNS name `server_$(printf "%03d" N).cumed-workshop.com`, where `N` is a number between 1 and 30 (30 attendees). 
 
 To access a AWS EC instance, attendee needs AWS [key pairs](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/create-key-pairs.html#having-ec2-create-your-key-pair), which has already been created. 
 
@@ -27,8 +27,6 @@ Attendee-specific EC2 server address and key pairs will be delivered on the day 
 Workshop servers use Ubuntu 22.04 LTS with Xfce lightweight desktop env. After `ssh` to the server, attendees could use [VNC](https://en.wikipedia.org/wiki/Virtual_Network_Computing) to access the Xfce graphical desktop.
 
 ### Windows OS
-
-For Windows users, please download putty/puttygen [binaries](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html):
 
 For X64 (64-bit x86) system (most user should use this one), please download: [putty](https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe) and [puttygen](https://the.earth.li/~sgtatham/putty/latest/w64/puttygen.exe).
 
