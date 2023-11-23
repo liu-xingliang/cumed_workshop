@@ -91,13 +91,6 @@ Please follow the step-by-step instructions below:
 <img src="./img/putty_terminal.svg" width="400">
 </p>
 
-_PS: after login to server, please also set up a fresh VNC session:_
-
-```bash
-vncserver -kill :1
-vncserver -localhost -geometry 1600x1200
-```
-
 #### 3. Connecting to Ubuntu desktop using RealVNC
 
 Attendee could download a standalone binary of RealVNC client without installation (e.g., X64 system): https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Windows-64bit.exe. Other architectures, please check the [download page](https://www.realvnc.com/en/connect/download/viewer/windows/). While connecting to the remote server using VNC through "localhost:5901", please **keep the putty ssh session alive**.
@@ -117,6 +110,13 @@ Password is "ubuntu":
 <p align="left">
 <img src="./img/realvnc_password.svg" width="400">
 </p>
+
+_PS: If attendees get VNC connection issues, please set up a fresh VNC session by running below command on EC2 server:_
+
+```bash
+vncserver -kill :1
+vncserver -localhost -geometry 1600x1200
+```
 
 ### Linux/MacOS
 
@@ -147,6 +147,13 @@ While keep the above ssh session alive. Attendees simply go "Finder" -> "Go" -> 
 #### Linux user VNC to EC2 server
 
 Similar to Windows OS, attendees could also use standalone RealVNC client for Linux here: https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Linux-x64.
+
+_PS: Again, if attendees get VNC connection issues, please set up a fresh VNC session by running below command on EC2 server:_
+
+```bash
+vncserver -kill :1
+vncserver -localhost -geometry 1600x1200
+```
 
 ## Pre-installed visualization tools for viewing pipeline results
 

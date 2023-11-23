@@ -12,33 +12,33 @@ duration: 90 minutes
 	- [Setting up Conda computing environment](#setting-up-conda-computing-environment)
 	- [Installing Singularity](#installing-singularity)
 	- [Downloading reference dataset](#downloading-reference-dataset)
-- [Key pipeline steps and output](#key-pipeline-steps-and-output)
-	- [Sample level analysis](#sample-level-analysis)
-		- [0. Creating folder for hacked run of the pipeline](#0-creating-folder-for-hacked-run-of-the-pipeline)
-		- [1. Mapping HiFi reads to reference genome (GRCh38)](#1-mapping-hifi-reads-to-reference-genome-grch38)
-		- [2. Calling structural variants with `pbsv`](#2-calling-structural-variants-with-pbsv)
-		- [3. Integrating all pbsv vcfs](#3-integrating-all-pbsv-vcfs)
-		- [4. deepvariant](#4-deepvariant)
-			- [make\_examples](#make_examples)
-			- [call\_variants (CPU only)](#call_variants-cpu-only)
-			- [postprocess\_variants](#postprocess_variants)
-		- [5. bcftools `stats` and `roh`](#5-bcftools-stats-and-roh)
-		- [6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`](#6-phasing-small-variants-snpsindels-and-svs-using-hiphase)
-		- [7. Resolving highly homologous genes/paralogs with `paraphase`](#7-resolving-highly-homologous-genesparalogs-with-paraphase)
-		- [8. Tandem repeats genotyper (TRGT)](#8-tandem-repeats-genotyper-trgt)
-		- [9. Calculating 5mC CpG methylation probabilities](#9-calculating-5mc-cpg-methylation-probabilities)
-		- [10. Getting reference genome coverage](#10-getting-reference-genome-coverage)
-		- [11. Copy number variant (CNV) calling with HiFiCNV.](#11-copy-number-variant-cnv-calling-with-hificnv)
-	- [Cohort analysis](#cohort-analysis)
-		- [1. Small variants joint calling with `glnexus`](#1-small-variants-joint-calling-with-glnexus)
-		- [2. Large-scale SVs joint-calling with `pbsv`](#2-large-scale-svs-joint-calling-with-pbsv)
-		- [bcftools concat](#bcftools-concat)
-		- [Phasing Joint variants calls with `hiphase`](#phasing-joint-variants-calls-with-hiphase)
-	- [Tertiary analysis](#tertiary-analysis)
-		- [write\_yaml\_ped\_phrank](#write_yaml_ped_phrank)
-		- [svpack\_filter\_annotated](#svpack_filter_annotated)
-		- [slivar\_svpack\_tsv](#slivar_svpack_tsv)
-		- [slivar\_small\_variant](#slivar_small_variant)
+	- [Key pipeline steps and output](#key-pipeline-steps-and-output)
+		- [Sample level analysis](#sample-level-analysis)
+			- [0. Creating folder for hacked run of the pipeline](#0-creating-folder-for-hacked-run-of-the-pipeline)
+			- [1. Mapping HiFi reads to reference genome (GRCh38)](#1-mapping-hifi-reads-to-reference-genome-grch38)
+			- [2. Calling structural variants with `pbsv`](#2-calling-structural-variants-with-pbsv)
+			- [3. Integrating all pbsv vcfs](#3-integrating-all-pbsv-vcfs)
+			- [4. deepvariant](#4-deepvariant)
+				- [make\_examples](#make_examples)
+				- [call\_variants (CPU only)](#call_variants-cpu-only)
+				- [postprocess\_variants](#postprocess_variants)
+			- [5. bcftools `stats` and `roh`](#5-bcftools-stats-and-roh)
+			- [6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`](#6-phasing-small-variants-snpsindels-and-svs-using-hiphase)
+			- [7. Resolving highly homologous genes/paralogs with `paraphase`](#7-resolving-highly-homologous-genesparalogs-with-paraphase)
+			- [8. Tandem repeats genotyper (TRGT)](#8-tandem-repeats-genotyper-trgt)
+			- [9. Calculating 5mC CpG methylation probabilities](#9-calculating-5mc-cpg-methylation-probabilities)
+			- [10. Getting reference genome coverage](#10-getting-reference-genome-coverage)
+			- [11. Copy number variant (CNV) calling with HiFiCNV.](#11-copy-number-variant-cnv-calling-with-hificnv)
+		- [Cohort analysis](#cohort-analysis)
+			- [1. Small variants joint calling with `glnexus`](#1-small-variants-joint-calling-with-glnexus)
+			- [2. Large-scale SVs joint-calling with `pbsv`](#2-large-scale-svs-joint-calling-with-pbsv)
+			- [3. bcftools concat](#3-bcftools-concat)
+			- [4. Phasing Joint variants calls with `hiphase`](#4-phasing-joint-variants-calls-with-hiphase)
+		- [Tertiary analysis](#tertiary-analysis)
+			- [1. write\_yaml\_ped\_phrank](#1-write_yaml_ped_phrank)
+			- [2. svpack\_filter\_annotated](#2-svpack_filter_annotated)
+			- [3. slivar\_svpack\_tsv](#3-slivar_svpack_tsv)
+			- [4. slivar\_small\_variant](#4-slivar_small_variant)
 - [Running pipeline using miniwdl and Slurm](#running-pipeline-using-miniwdl-and-slurm)
 	- [Downloading the github repository for latest version of pipeline](#downloading-the-github-repository-for-latest-version-of-pipeline)
 	- [Preparing input JSON file for the pipeline](#preparing-input-json-file-for-the-pipeline)
@@ -344,9 +344,9 @@ dataset/
 10 directories, 63 files
 ```
 
-## Key pipeline steps and output
+### Key pipeline steps and output
 
-### Sample level analysis
+#### Sample level analysis
 
 Run for each sample in the cohort. Align reads from each movie to the reference genome, then calls and phases small and structural variants.
 
@@ -356,13 +356,13 @@ Docker images and corresponding tool versions for current repo commit used for t
 
 To help BFX attendees understand better what the pipeline does for each step, i,e., which tool/command is invoked. We will do "hacked run": hack into the pipeline, run each analysis step using corresponding command lines with Singularity shell and pre-built docker image.
 
-#### 0. Creating folder for hacked run of the pipeline
+##### 0. Creating folder for hacked run of the pipeline
 
 ```bash
 mkdir -p ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run
 ```
 
-#### 1. Mapping HiFi reads to reference genome (GRCh38) 
+##### 1. Mapping HiFi reads to reference genome (GRCh38) 
 
 This step takes around 10 mins to finish. Unpatient attendees don't need to run this step by themselves, aligned bam is provided: `~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/HG002.GRCh38.chr7.10X.aligned.bam` for next step.
 
@@ -602,7 +602,7 @@ time awk '{{ print ($3>50?50:$3) "\t" $2; }}' \
 ```
 -->
 
-#### 2. Calling structural variants with `pbsv`
+##### 2. Calling structural variants with `pbsv`
 
 Pbsv uses two steps to call SVs in VCF format:
 1. `pbsv discover`: find SV signatures in read alignments (BAM to SVSIG)
@@ -674,7 +674,7 @@ To visualize this deletion, we can download pbmm2 alignment: `/home/ubuntu/CUMED
 <img src="./img/chr7_del_igv.svg" width="680">
 </p>
 
-#### 3. Integrating all pbsv vcfs
+##### 3. Integrating all pbsv vcfs
 
 As we only have one vcf for chr7, therefore skip this step.
 
@@ -697,9 +697,9 @@ As we only have one vcf for chr7, therefore skip this step.
 # bcftools index --tbi HG002.GRCh38.pbsv.vcf.gz
 ```
 
-#### 4. deepvariant
+##### 4. deepvariant
 
-##### make_examples
+###### make_examples
 
 `make_examples` consumes reads and the reference genome to create TensorFlow examples for evaluation with the deep learning models.
 
@@ -749,7 +749,7 @@ time seq 0 15 | parallel --jobs 4 /opt/deepvariant/bin/make_examples \
 # sys	0m27.740s
 ```
 
-##### call_variants (CPU only)
+###### call_variants (CPU only)
 
 `call_variants` consumes TFRecord file(s) of tf.Examples protos created by `make_examples` and a deep learning model checkpoint and evaluates the model on each example in the input TFRecord. The output here is a TFRecord of CallVariantsOutput protos. call_variants doesn't directly support sharding its outputs, but accepts a glob or shard-pattern for its inputs.
 
@@ -770,7 +770,7 @@ time /opt/deepvariant/bin/call_variants \
 # sys	0m26.536s
 ```
 
-##### postprocess_variants
+###### postprocess_variants
 
 `postprocess_variants` is a single-threaded program, reads all of the output TFRecord files from call_variants, sorts them, combines multi-allelic records, and writes out a VCF file. When gVCF output is requested, **it also outputs a gVCF file which merges the VCF with the non-variant sites**.
 
@@ -805,7 +805,7 @@ And check specific variant in IGV. E.g.:
 <img src="./img/chr7_snp_igv.svg" width="680">
 </p>
 
-#### 5. bcftools `stats` and `roh`
+##### 5. bcftools `stats` and `roh`
 
 `bcftools stats`
 
@@ -930,7 +930,7 @@ The peak coverage of genotypes is ~10X which is consistent to demo dataset depth
 
 For more versatile vcf statistics visualization, attendees could try [vcfstats](https://github.com/pwwang/vcfstats).
 
-#### 6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`
+##### 6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`
 
 [HiPhase](https://github.com/PacificBiosciences/HiPhase) will phase variant calls made from PacBio HiFi datasets. HiPhase can phase both small variants (SNPs/INDELs) like WhatsHap and large-scale SVs, which is difficult to handle with WhatsHap.
 
@@ -986,7 +986,7 @@ As PacBio HiFi reads have 5mC CpG probability info (MM and ML tags), therefore i
 <img src="./img/haplotagged_bam_5mC_igv_how.svg" width="1000">
 </p>
 
-#### 7. Resolving highly homologous genes/paralogs with `paraphase`
+##### 7. Resolving highly homologous genes/paralogs with `paraphase`
 
 [Paraphase](https://github.com/PacificBiosciences/paraphase) is a  HiFi-based genotyper for highly homologous genes falling into the challenging segmental duplication (SD) regions of human genome.
 
@@ -1030,7 +1030,7 @@ Including copy numbers, final haplotypes for pms2 and its paralog pms2cl, varian
 <img src="./img/paraphase_json.svg" width="1000">
 </p>
 
-#### 8. Tandem repeats genotyper (TRGT)
+##### 8. Tandem repeats genotyper (TRGT)
 
 [TRGT](https://github.com/PacificBiosciences/trgt) is a tool for targeted genotyping of tandem repeats from PacBio HiFi data.
 
@@ -1201,7 +1201,7 @@ trvz --genome /mnt/dataset/GRCh38/human_GRCh38_no_alt_analysis_set.fasta \
 
 From TRVZ plot we could spot shorter tandem repeats: (TTTTTA)4 comparing to reference: (TTTTTA)5.
 
-#### 9. Calculating 5mC CpG methylation probabilities
+##### 9. Calculating 5mC CpG methylation probabilities
 
 Propabilities for 5mC methylation of CpG sites can be calculated using `aligned_bam_to_cpg_scores` of [pb-CpG-tools](https://github.com/PacificBiosciences/pb-CpG-tools).
 
@@ -1244,7 +1244,7 @@ Track files (.bw: bigWig) of pb-CpG-tools could be visualized in IGV:
 
 
 
-#### 10. Getting reference genome coverage
+##### 10. Getting reference genome coverage
 
 Use [mosdepth](https://github.com/brentp/mosdepth) to get reference genome coverage after `pbmm2` alignment.
 
@@ -1280,7 +1280,7 @@ awk -F"\t" 'NR==1 || $1=="chr7"' ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run
 # chr7   159345973  1589288431  9.97  0    126
 ```
 
-#### 11. Copy number variant (CNV) calling with HiFiCNV.
+##### 11. Copy number variant (CNV) calling with HiFiCNV.
 
 [HiFiCNV](https://github.com/PacificBiosciences/HiFiCNV) is a CNV caller optimized for HiFi reads.
 
@@ -1352,9 +1352,9 @@ wget -q https://raw.githubusercontent.com/PacificBiosciences/HiFiCNV/v${VER}/dat
 ```
 
 
-### Cohort analysis
+#### Cohort analysis
 
-#### 1. Small variants joint calling with `glnexus`
+##### 1. Small variants joint calling with `glnexus`
 
 In previous section, we showed per-sample analysis in the pipeline using HG002 as example. In practice, when there are more than one samples, the pipeline will apply above per-sample analysis for each sample iteratively.
 
@@ -1406,7 +1406,7 @@ tabix --version
 time tabix /mnt/out/call_glnexus/HG002_trio.joint.GRCh38.deepvariant.glnexus.vcf.gz
 ```
 
-#### 2. Large-scale SVs joint-calling with `pbsv`
+##### 2. Large-scale SVs joint-calling with `pbsv`
 
 ```bash
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
@@ -1436,7 +1436,7 @@ bgzip /mnt/out/call_pbsv/HG002_trio.joint.GRCh38.chr7.pbsv.vcf
 tabix -p vcf /mnt/out/call_pbsv/HG002_trio.joint.GRCh38.chr7.pbsv.vcf.gz
 ```
 
-#### bcftools concat
+##### 3. bcftools concat
 
 To speed up pbsv joint calling, the pipeline split pbsv run into 14 shards based on pre-configuration of `dataset/GRCh38/human_GRCh38_no_alt_analysis_set.pbsv_splits.json`. Therefore, in a full dataset run, user would expect 14 chunks of pbsv outcomes and `bcftools concat` will be applied to merge all chunks into final joint calls.
 
@@ -1470,7 +1470,7 @@ sha1sum <(zcat /mnt/out/call_pbsv/HG002_trio.joint.GRCh38.pbsv.vcf.gz | awk '!/^
 # 1ac64a5f7bc135c5eb5d99fea411a1c1e1db5cd0  /dev/fd/63
 ```
 
-#### Phasing Joint variants calls with `hiphase`
+##### 4. Phasing Joint variants calls with `hiphase`
 
 Joint variants calls could also be phased.
 
@@ -1508,7 +1508,7 @@ for phased_vcf in /mnt/out/call_hiphase/HG002_trio.joint.GRCh38.deepvariant.glne
 done
 ```
 
-### Tertiary analysis
+#### Tertiary analysis
 
 Annotate small and structural variant VCFs using slivar. Outputs annotated VCFs and TSVs. **This workflow is run on a phased single-sample VCF if there is only a single individual in the cohort, otherwise it is run on the joint-called phased VCF**.
 
@@ -1517,7 +1517,7 @@ Tertinary analysis will be skipped in this workshop but with pipeline commands p
 2. Tertiary analysis needs more senario-specific (e.g., disease-specific) results interpretation, which is not the goal of this workshop.
 3. Time is limited.
 
-#### write_yaml_ped_phrank
+##### 1. write_yaml_ped_phrank
 
 A JSON file for samples information of the cohort need to be prepared before this step:
 
@@ -1657,7 +1657,7 @@ calculate_phrank.py \
 #   cohort_list = yaml.load("".join(yamlfile))
 ```
 
-#### svpack_filter_annotated
+##### 2. svpack_filter_annotated
 
 ```bash
 singularity pull svpack.sif docker://quay.io/pacbio/svpack@sha256:a680421cb517e1fa4a3097838719a13a6bd655a5e6980ace1b03af9dd707dd75
@@ -1701,7 +1701,7 @@ tabix --version
 tabix -p vcf /mnt/out/call_tertiary/HG002_trio.joint.GRCh38.pbsv.phased.svpack.vcf.gz
 ```
 
-#### slivar_svpack_tsv
+##### 3. slivar_svpack_tsv
 
 ```bash
 singularity pull slivar.sif docker://quay.io/pacbio/slivar@sha256:0a09289ccb760da310669906c675be02fd16b18bbedc971605a587275e34966c
@@ -1730,7 +1730,7 @@ time slivar tsv \
 > /mnt/out/call_tertiary/HG002_trio.joint.GRCh38.pbsv.phased.svpack.tsv
 ```
 
-#### slivar_small_variant
+##### 4. slivar_small_variant
 
 ```bash
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data -B ${PWD}:/mnt/out slivar.sif
