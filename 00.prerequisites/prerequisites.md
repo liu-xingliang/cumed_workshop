@@ -30,7 +30,7 @@ Workshop servers use Ubuntu 22.04 LTS with Xfce lightweight desktop env. After `
 
 For Windows users, please download putty/puttygen [binaries](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html):
 
-For X64 (64-bit x86) system (most user should use this one), please download: [putty](https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe) and [puttygen](https://the.earth.li/~sgtatham/putty/latest/w64/puttygen.exe)
+For X64 (64-bit x86) system (most user should use this one), please download: [putty](https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe) and [puttygen](https://the.earth.li/~sgtatham/putty/latest/w64/puttygen.exe).
 
 For other architecture, please find corresponding binaries [here](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).
 
