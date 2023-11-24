@@ -53,6 +53,15 @@ For X64 (64-bit x86) system (most user should use this one), please download: [p
 
 For x64 system, download [VNC-Viewer-7.8.0-Windows-64bit.exe](https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Windows-64bit.exe). Other architectures, please check the [download page](https://www.realvnc.com/en/connect/download/viewer/windows/). While connecting to the remote server using VNC through "localhost:5901", please **keep the putty ssh session alive**.
 
+In putty terminal, please do:
+
+```bash
+vncserver -kill :1
+vncserver -localhost -geometry 1600x1200
+```
+
+Then, open RealVNC and input "localhost:5901" in the address bar:
+
 <p align="left">
 <img src="./img/windows_vnc.svg" width="400">
 </p>
