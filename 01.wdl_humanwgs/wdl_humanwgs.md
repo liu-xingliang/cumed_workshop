@@ -12,47 +12,33 @@ duration: 90 minutes
 * Understand how to prepare input (JSON) file and miniwdl configuration files for running the pipeline using Slurm job management system (JMS) on a high-performing computer (HPC)
 
 
-- [Workflow of PacBio WDL WGS Variant Analysis Pipeline](#workflow-of-pacbio-wdl-wgs-variant-analysis-pipeline)
-- [Demo dataset](#demo-dataset)
-	- [Downsampling](#downsampling)
-- [Pipeline execution walk-through using downsampled demo dataset](#pipeline-execution-walk-through-using-downsampled-demo-dataset)
-	- [Setting up Conda computing environment](#setting-up-conda-computing-environment)
-	- [Installing Singularity](#installing-singularity)
-	- [Downloading reference dataset](#downloading-reference-dataset)
-	- [Key pipeline steps and output](#key-pipeline-steps-and-output)
-		- [Sample level analysis](#sample-level-analysis)
-			- [0. Creating folder for hacked run of the pipeline](#0-creating-folder-for-hacked-run-of-the-pipeline)
-			- [1. Mapping HiFi reads to reference genome (GRCh38)](#1-mapping-hifi-reads-to-reference-genome-grch38)
-			- [2. Calling structural variants with `pbsv`](#2-calling-structural-variants-with-pbsv)
-			- [3. Integrating all pbsv vcfs](#3-integrating-all-pbsv-vcfs)
-			- [4. deepvariant](#4-deepvariant)
-				- [make\_examples](#make_examples)
-				- [call\_variants (CPU only)](#call_variants-cpu-only)
-				- [postprocess\_variants](#postprocess_variants)
-			- [5. bcftools `stats` and `roh`](#5-bcftools-stats-and-roh)
-			- [6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`](#6-phasing-small-variants-snpsindels-and-svs-using-hiphase)
-			- [7. Resolving highly homologous genes/paralogs with `paraphase`](#7-resolving-highly-homologous-genesparalogs-with-paraphase)
-			- [8. Tandem repeats genotyper (TRGT)](#8-tandem-repeats-genotyper-trgt)
-			- [9. Calculating 5mC CpG methylation probabilities](#9-calculating-5mc-cpg-methylation-probabilities)
-			- [10. Getting reference genome coverage](#10-getting-reference-genome-coverage)
-			- [11. Copy number variant (CNV) calling with HiFiCNV.](#11-copy-number-variant-cnv-calling-with-hificnv)
-		- [Cohort analysis](#cohort-analysis)
-			- [1. Small variants joint calling with `glnexus`](#1-small-variants-joint-calling-with-glnexus)
-			- [2. Large-scale SVs joint-calling with `pbsv`](#2-large-scale-svs-joint-calling-with-pbsv)
-			- [3. bcftools concat](#3-bcftools-concat)
-			- [4. Phasing Joint variants calls with `hiphase`](#4-phasing-joint-variants-calls-with-hiphase)
-		- [Tertiary analysis](#tertiary-analysis)
-			- [1. write\_yaml\_ped\_phrank](#1-write_yaml_ped_phrank)
-			- [2. svpack\_filter\_annotated](#2-svpack_filter_annotated)
-			- [3. slivar\_svpack\_tsv](#3-slivar_svpack_tsv)
-			- [4. slivar\_small\_variant](#4-slivar_small_variant)
-- [Running pipeline using miniwdl and Slurm](#running-pipeline-using-miniwdl-and-slurm)
-	- [Downloading the github repository for latest version of pipeline](#downloading-the-github-repository-for-latest-version-of-pipeline)
-	- [Preparing input JSON file for the pipeline](#preparing-input-json-file-for-the-pipeline)
-	- [Splitted call of pbsv](#splitted-call-of-pbsv)
-	- [Executing pipeline using JMS (Slurm)](#executing-pipeline-using-jms-slurm)
-	- [Other notes](#other-notes)
-		- [Call cache](#call-cache)
+- [And then your images are here:](#and-then-your-images-are-here)
+					- [call\_variants (CPU only)](#call_variants-cpu-only)
+					- [postprocess\_variants](#postprocess_variants)
+				- [5. bcftools `stats` and `roh`](#5-bcftools-stats-and-roh)
+				- [6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`](#6-phasing-small-variants-snpsindels-and-svs-using-hiphase)
+				- [7. Resolving highly homologous genes/paralogs with `paraphase`](#7-resolving-highly-homologous-genesparalogs-with-paraphase)
+				- [8. Tandem repeats genotyper (TRGT)](#8-tandem-repeats-genotyper-trgt)
+				- [9. Calculating 5mC CpG methylation probabilities](#9-calculating-5mc-cpg-methylation-probabilities)
+				- [10. Getting reference genome coverage](#10-getting-reference-genome-coverage)
+				- [11. Copy number variant (CNV) calling with HiFiCNV.](#11-copy-number-variant-cnv-calling-with-hificnv)
+			- [Cohort analysis](#cohort-analysis)
+				- [1. Small variants joint calling with `glnexus`](#1-small-variants-joint-calling-with-glnexus)
+				- [2. Large-scale SVs joint-calling with `pbsv`](#2-large-scale-svs-joint-calling-with-pbsv)
+				- [3. bcftools concat](#3-bcftools-concat)
+				- [4. Phasing Joint variants calls with `hiphase`](#4-phasing-joint-variants-calls-with-hiphase)
+			- [Tertiary analysis](#tertiary-analysis)
+				- [1. write\_yaml\_ped\_phrank](#1-write_yaml_ped_phrank)
+				- [2. svpack\_filter\_annotated](#2-svpack_filter_annotated)
+				- [3. slivar\_svpack\_tsv](#3-slivar_svpack_tsv)
+				- [4. slivar\_small\_variant](#4-slivar_small_variant)
+	- [Running pipeline using miniwdl and Slurm](#running-pipeline-using-miniwdl-and-slurm)
+		- [Downloading the github repository for latest version of pipeline](#downloading-the-github-repository-for-latest-version-of-pipeline)
+		- [Preparing input JSON file for the pipeline](#preparing-input-json-file-for-the-pipeline)
+		- [Splitted call of pbsv](#splitted-call-of-pbsv)
+		- [Executing pipeline using JMS (Slurm)](#executing-pipeline-using-jms-slurm)
+		- [Other notes](#other-notes)
+			- [Call cache](#call-cache)
 
 
 
@@ -76,7 +62,9 @@ The demo dataset contains three samples: Genome in a Bottle (GIAB) Ashkenazi tri
 
 ### Downsampling
 
-Original datasets are ~30X whole genome sequencing (WGS) data generated on [Revio](https://www.pacb.com/revio/). For this workshop, data was downsampled to 10X coverage on chr7 by creating a dummy uBAM set (reads aligned to chr7 with 10X coverage). The reasons of choosing chr7 are:
+Original datasets are ~30X whole genome sequencing (WGS) data generated on [Revio](https://www.pacb.com/revio/). For this workshop, data was downsampled to 10X coverage on chr7 by creating a dummy uBAM set (reads aligned to chr7 with 10X coverage). 
+
+<!--The reasons of choosing chr7 are:
 1. Known copy number loss near centromere of chr7 in HG002.
 2. Known large-scale tandem repeats in chr7:
 
@@ -96,7 +84,7 @@ zcat hg38.trf.bed.gz | awk -F"\t" 'BEGIN{OFS="\t"}$1=="chr7"{print $1,$2,$3,$3-$
 ```
 
 PacBio WGS Analysis Pipeline can detect them.
-
+-->
 
 ```bash
 # download full HiFi bam files:
@@ -215,7 +203,7 @@ mosdepth=0.3.5
 
 ### Installing Singularity
 
-Singularity has already been installed on the server using following scripts.
+In this workshop, we will use [Singularity](https://docs.sylabs.io/guides/2.6/user-guide/introduction.html) for pre-built docker images in each step of the pipeline. Singularity has already been installed on the server using following scripts and **all required docker images have already been pulled down to workshop EC2 servers**.
 
 ```bash
 #!/bin/bash -i
@@ -364,7 +352,7 @@ mkdir -p ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run
 This step takes around 10 mins to finish. Impatient attendees don't need to run this step by themselves, aligned bam is provided: `~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/HG002.GRCh38.chr7.10X.aligned.bam` for next step.
 
 ```bash
-singularity pull pbmm2.sif docker://quay.io/pacbio/pbmm2@sha256:1013aa0fd5fb42c607d78bfe3ec3d19e7781ad3aa337bf84d144c61ed7d51fa1
+# singularity pull pbmm2.sif docker://quay.io/pacbio/pbmm2@sha256:1013aa0fd5fb42c607d78bfe3ec3d19e7781ad3aa337bf84d144c61ed7d51fa1
 
 # create Singularity shell using pulled docker image
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
@@ -608,7 +596,7 @@ Pbsv uses two steps to call SVs in VCF format:
 It is highly recommended to provide one tandem repeat annotation .bed file (e.g., `dataset/GRCh38/human_GRCh38_no_alt_analysis_set.trf.bed`) of your reference to pbsv discover via --tandem-repeats. This increases sensitivity and recall.
 
 ```bash
-singularity pull pbsv.sif docker://quay.io/pacbio/pbsv@sha256:d78ee6deb92949bdfde98d3e48dab1d871c177d48d8c87c73d12c45bdda43446
+# singularity pull pbsv.sif docker://quay.io/pacbio/pbsv@sha256:d78ee6deb92949bdfde98d3e48dab1d871c177d48d8c87c73d12c45bdda43446
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -677,7 +665,7 @@ As we only have one vcf for chr7, therefore skip this step.
 
 ```bash
 # skip
-# singularity pull bcftools.sif docker://quay.io/pacbio/bcftools@sha256:36d91d5710397b6d836ff87dd2a924cd02fdf2ea73607f303a8544fbac2e691f
+# # singularity pull bcftools.sif docker://quay.io/pacbio/bcftools@sha256:36d91d5710397b6d836ff87dd2a924cd02fdf2ea73607f303a8544fbac2e691f
 # 
 # singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 # -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -711,7 +699,7 @@ To increase the level of parallelism, `make_examples` supports sharding of its i
 
 ```bash
 # gcr.io/deepvariant-docker/deepvariant:1.5.0
-singularity pull deepvariant.sif docker://gcr.io/deepvariant-docker/deepvariant:1.5.0
+# singularity pull deepvariant.sif docker://gcr.io/deepvariant-docker/deepvariant:1.5.0
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -745,6 +733,8 @@ time seq 0 15 | parallel --jobs 4 /opt/deepvariant/bin/make_examples \
 # user	97m55.869s
 # sys	0m27.740s
 ```
+
+For more details of what `make_examples` does, please refer to the [deepvariant docs](https://google.github.io/deepvariant/posts/2020-02-20-looking-through-deepvariants-eyes/).
 
 ###### call_variants (CPU only)
 
@@ -802,6 +792,35 @@ And check specific variant in IGV. E.g.:
 <img src="./img/chr7_snp_igv.svg" width="680">
 </p>
 
+To understand how a candidate variant of interest was represented when it was passed into the neural network in DeepVariant. `show_examples` can print pileup images used within DeepVariant and save them as PNG image files.
+
+```bash
+# prepare VCF for targeted variant 
+cd /home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant
+zcat HG002.GRCh38.deepvariant.vcf.gz | awk -F"\t" '/^#/ || ($1=="chr7" && $2==44935)' > chr7_44935_C_T.vcf
+
+singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
+-B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
+-B ${PWD}:/mnt/out deepvariant.sif
+
+mkdir -p /mnt/out/call_deepvariant/show_examples
+
+time /opt/deepvariant/bin/show_examples \
+  --examples=/mnt/out/call_deepvariant/example_tfrecords/HG002.examples.tfrecord@16.gz \
+  --vcf /mnt/out/call_deepvariant/chr7_44935_C_T.vcf \
+  --output=/mnt/out/call_deepvariant/show_examples/pileup
+
+# real	6m23.365s
+# user	3m49.055s
+# sys	0m1.187s
+```
+
+There will be only one image outputed (for the only one variant selected): `/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/show_examples/pileup_channels_chr7:44934_C->T.png`
+
+<p align="left">
+<img src="./img/pileup_channels_chr7_44934_C_T.png" width="1000">
+</p>
+
 ##### 5. bcftools `stats` and `roh`
 
 `bcftools stats`
@@ -813,7 +832,7 @@ Parses VCF or BCF and produces stats which can be plotted using plot-vcfstats.
 HMM model for detecting runs of autozygosity.
 
 ```bash
-singularity pull bcftools.sif docker://quay.io/pacbio/bcftools@sha256:36d91d5710397b6d836ff87dd2a924cd02fdf2ea73607f303a8544fbac2e691f
+# singularity pull bcftools.sif docker://quay.io/pacbio/bcftools@sha256:36d91d5710397b6d836ff87dd2a924cd02fdf2ea73607f303a8544fbac2e691f
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -899,6 +918,7 @@ python3 plot.py
 
 A few meaningful plots for this single chr demo dataset:
 
+<!--
 1. tstv_by_qual.0.png
 
 Ts/Tv (transition-to-transversion) ratio is around 2-2.10, which is expected for human across the whole genome.
@@ -906,8 +926,9 @@ Ts/Tv (transition-to-transversion) ratio is around 2-2.10, which is expected for
 <p align="left">
 <img src="./img/tstv_by_qual.0.png" width="300">
 </p>
+-->
 
-2. indel_vaf.0.png
+1. indel_vaf.0.png
 
 An overview of alternative allele%.
 
@@ -916,7 +937,7 @@ An overview of alternative allele%.
 </p>
 
 
-3. depth.0.png
+2. depth.0.png
 
 The peak coverage of genotypes is ~10X which is consistent to demo dataset depth.
 
@@ -925,14 +946,14 @@ The peak coverage of genotypes is ~10X which is consistent to demo dataset depth
 </p>
 
 
-For more versatile vcf statistics visualization, attendees could try [vcfstats](https://github.com/pwwang/vcfstats).
+For more versatile vcf statistics visualization, attendees could try [/opt/deepvariant/bin/vcf_stats_report](https://github.com/google/deepvariant/blob/r1.5/docs/deepvariant-vcf-stats-report.md).
 
 ##### 6. Phasing small variants (SNPs/INDELs) and SVs using `hiphase`
 
 [HiPhase](https://github.com/PacificBiosciences/HiPhase) will phase variant calls made from PacBio HiFi datasets. HiPhase can phase both small variants (SNPs/INDELs) like WhatsHap and large-scale SVs, which is difficult to handle with WhatsHap.
 
 ```bash
-singularity pull hiphase.sif  docker://quay.io/pacbio/hiphase@sha256:c09ec4d70568593098bf877475d15a4cd8e46b5173b91b07ac98c4518817341f
+# singularity pull hiphase.sif  docker://quay.io/pacbio/hiphase@sha256:c09ec4d70568593098bf877475d15a4cd8e46b5173b91b07ac98c4518817341f
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -988,7 +1009,7 @@ As PacBio HiFi reads have 5mC CpG probability info (MM and ML tags), therefore i
 [Paraphase](https://github.com/PacificBiosciences/paraphase) is a  HiFi-based genotyper for highly homologous genes falling into the challenging segmental duplication (SD) regions of human genome.
 
 ```bash
-singularity pull paraphase.sif docker://quay.io/pacbio/paraphase@sha256:186dec5f6dabedf8c90fe381cd8f934d31fe74310175efee9ca4f603deac954d
+# singularity pull paraphase.sif docker://quay.io/pacbio/paraphase@sha256:186dec5f6dabedf8c90fe381cd8f934d31fe74310175efee9ca4f603deac954d
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -1050,7 +1071,7 @@ mv human_GRCh38_no_alt_analysis_set.trgt.v0.5.0.bed ~/CUMED_BFX_workshop/01.wdl_
 To run TRGT, please use the following commands:
 
 ```bash
-singularity pull trgt.sif docker://quay.io/pacbio/trgt@sha256:8c9f236eb3422e79d7843ffd59e1cbd9b76774525f20d88cd68ca64eb63054eb
+# singularity pull trgt.sif docker://quay.io/pacbio/trgt@sha256:8c9f236eb3422e79d7843ffd59e1cbd9b76774525f20d88cd68ca64eb63054eb
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -1203,7 +1224,7 @@ From TRVZ plot we could spot shorter tandem repeats: (TTTTTA)4 comparing to refe
 Propabilities for 5mC methylation of CpG sites can be calculated using `aligned_bam_to_cpg_scores` of [pb-CpG-tools](https://github.com/PacificBiosciences/pb-CpG-tools).
 
 ```bash
-singularity pull pb-cpg-tools.sif docker://quay.io/pacbio/pb-cpg-tools@sha256:b95ff1c53bb16e53b8c24f0feaf625a4663973d80862518578437f44385f509b
+# singularity pull pb-cpg-tools.sif docker://quay.io/pacbio/pb-cpg-tools@sha256:b95ff1c53bb16e53b8c24f0feaf625a4663973d80862518578437f44385f509b
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -1246,7 +1267,7 @@ Track files (.bw: bigWig) of pb-CpG-tools could be visualized in IGV:
 Use [mosdepth](https://github.com/brentp/mosdepth) to get reference genome coverage after `pbmm2` alignment.
 
 ```bash
-singularity pull mosdepth.sif docker://quay.io/pacbio/mosdepth@sha256:35d5e02facf4f38742e5cae9e5fdd3807c2b431dd8d881fd246b55e6d5f7f600
+# singularity pull mosdepth.sif docker://quay.io/pacbio/mosdepth@sha256:35d5e02facf4f38742e5cae9e5fdd3807c2b431dd8d881fd246b55e6d5f7f600
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -1282,7 +1303,7 @@ awk -F"\t" 'NR==1 || $1=="chr7"' ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run
 [HiFiCNV](https://github.com/PacificBiosciences/HiFiCNV) is a CNV caller optimized for HiFi reads.
 
 ```bash
-singularity pull hificnv.sif docker://quay.io/pacbio/hificnv@sha256:19fdde99ad2454598ff7d82f27209e96184d9a6bb92dc0485cc7dbe87739b3c2
+# singularity pull hificnv.sif docker://quay.io/pacbio/hificnv@sha256:19fdde99ad2454598ff7d82f27209e96184d9a6bb92dc0485cc7dbe87739b3c2
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -1358,7 +1379,7 @@ In previous section, we showed per-sample analysis in the pipeline using HG002 a
 To save time, this workshop will not go through the per-sample analysis for parental samples (HG003: father and HG004: mother) of HG002-trio, but provide necessary sample-level analysis results for attendees to run down-stream cohort-level analysis.
 
 ```bash
-singularity pull glnexus.sif docker://quay.io/pacbio/glnexus@sha256:ce6fecf59dddc6089a8100b31c29c1e6ed50a0cf123da9f2bc589ee4b0c69c8e
+# singularity pull glnexus.sif docker://quay.io/pacbio/glnexus@sha256:ce6fecf59dddc6089a8100b31c29c1e6ed50a0cf123da9f2bc589ee4b0c69c8e
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -1559,7 +1580,7 @@ Put following content into `cohort.json`:
 ```
 
 ```bash
-singularity pull pyyaml.sif docker://quay.io/pacbio/pyyaml@sha256:af6f0689a7412b1edf76bd4bf6434e7fa6a86192eebf19573e8618880d9c1dbb
+# singularity pull pyyaml.sif docker://quay.io/pacbio/pyyaml@sha256:af6f0689a7412b1edf76bd4bf6434e7fa6a86192eebf19573e8618880d9c1dbb
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -1657,7 +1678,7 @@ calculate_phrank.py \
 ##### 2. svpack_filter_annotated
 
 ```bash
-singularity pull svpack.sif docker://quay.io/pacbio/svpack@sha256:a680421cb517e1fa4a3097838719a13a6bd655a5e6980ace1b03af9dd707dd75
+# singularity pull svpack.sif docker://quay.io/pacbio/svpack@sha256:a680421cb517e1fa4a3097838719a13a6bd655a5e6980ace1b03af9dd707dd75
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
@@ -1701,7 +1722,7 @@ tabix -p vcf /mnt/out/call_tertiary/HG002_trio.joint.GRCh38.pbsv.phased.svpack.v
 ##### 3. slivar_svpack_tsv
 
 ```bash
-singularity pull slivar.sif docker://quay.io/pacbio/slivar@sha256:0a09289ccb760da310669906c675be02fd16b18bbedc971605a587275e34966c
+# singularity pull slivar.sif docker://quay.io/pacbio/slivar@sha256:0a09289ccb760da310669906c675be02fd16b18bbedc971605a587275e34966c
 
 singularity shell -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/dataset:/mnt/dataset \
 -B ~/CUMED_BFX_workshop/01.wdl_humanwgs/data:/mnt/data \
