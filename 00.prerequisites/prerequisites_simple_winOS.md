@@ -7,7 +7,7 @@
 
 ## Download AWS EC2 private key
 
-Please use [cumed_user_key.ppk](https://github.com/liu-xingliang/cumed_workshop/blob/main/00.prerequisites/keys/cumed_user_key.ppk) uploaded to workshop github repository (Rigt-click and save).
+Please use [cumed_user_key.ppk](https://github.com/liu-xingliang/cumed_workshop/blob/main/00.prerequisites/keys/cumed_user_key.ppk) uploaded to workshop github repository.
 
 ## Access workshop EC2 server
 
