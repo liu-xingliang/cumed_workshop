@@ -992,6 +992,10 @@ After HiPhase, HiFi reads in the demo dataset will be phased into two haplotypes
 <img src="./img/haplotagged_bam_igv.svg" width="1000">
 </p>
 
+<p align="left">
+<img src="./img/igv_group_by_tag.svg" width="1000">
+</p>
+
 _(top panel is unphased pbmm2 alignment, while bottom panel is phased alignment from HiPhase, there are two haplotypes 1 and 2 corresponding to bam tags: `HP:i:1` and `HP:i:2`, while the 3rd row is for unphased reads)_
 
 As PacBio HiFi reads have 5mC CpG probability info (MM and ML tags), therefore in IGV (version: 2.16.2), we could also color alignment based on based modification (5mC): red color indicates 5mC CpG probability is greater than 50%, while blue color means it is smaller than 50%.
