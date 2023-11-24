@@ -13,7 +13,7 @@ duration: 90 minutes
 
 
 - [Workflow of PacBio WDL WGS Variant Analysis Pipeline](#workflow-of-pacbio-wdl-wgs-variant-analysis-pipeline)
-- [Understanding the demo dataset](#understanding-the-demo-dataset)
+- [Demo dataset](#demo-dataset)
 	- [Downsampling](#downsampling)
 - [Pipeline execution walk-through using downsampled demo dataset](#pipeline-execution-walk-through-using-downsampled-demo-dataset)
 	- [Setting up Conda computing environment](#setting-up-conda-computing-environment)
@@ -64,22 +64,19 @@ duration: 90 minutes
 
 PacBio WGS Variant Pipeline performs read alignment, variant calling, and phasing. Joint-calling of small variants and structural variants for cohorts and optional variant filtering and annotation is also available for HiFi human WGS.
 
-## Understanding the demo dataset
+## Demo dataset
 
-The demo dataset is downsampled from PacBio HiFi whole genome sequencing (WGS) datasets (coverage: ~30X) using the
-Revio system for the Genome in a Bottle Ashkenazi trio (child: HG002, father: HG003, mother: HG004), with one Revio SMRT Cell per biological replicate:
+The demo dataset contains three samples: Genome in a Bottle (GIAB) Ashkenazi trio (child: HG002, father: HG003, mother: HG004).
 
 |sample|replicate|
 |:---|:---|
 |HG002-rep1|HG002 replicate 1|
-|HG002-rep2|HG002 replicate 2|
-|HG002-rep3|HG002 replicate 3|
 |HG003-rep1|HG003 replicate 1|
 |HG004-rep1|HG004 replicate 1|
 
 ### Downsampling
 
-Create dummy uBAM sets (reads aligned to chr7 with 10X coverage) for workshop demo. The reasons of choosing chr7 are:
+Original datasets are ~30X whole genome sequencing (WGS) data generated on [Revio](https://www.pacb.com/revio/). For this workshop, data was downsampled to 10X coverage on chr7 by creating a dummy uBAM set (reads aligned to chr7 with 10X coverage). The reasons of choosing chr7 are:
 1. Known copy number loss near centromere of chr7 in HG002.
 2. Known large-scale tandem repeats in chr7:
 
@@ -350,11 +347,9 @@ dataset/
 
 #### Sample level analysis
 
-Run for each sample in the cohort. Align reads from each movie to the reference genome, then calls and phases small and structural variants.
+Per-sample analysis is applied to each sample in the cohort, including quality-control, HiFi reads alignment to the reference genome, full-spectrum variants calling and phasing (SNV/INDEL/SV).
 
-To enhance reproducibility, each step of the analysis was performed using [docker images](https://github.com/PacificBiosciences/wdl-dockerfiles), which are hosted in PacBio's [quay.io](https://quay.io/organization/pacbio).
-
-Docker images and corresponding tool versions for current repo commit used for this workshop can be found [here](https://github.com/PacificBiosciences/HiFi-human-WGS-WDL/tree/b6a2cd27bc5cb762afd1a9891d622cdf29fb5f39#tool-versions-and-docker-images).
+To enhance reproducibility, each step of the analysis was performed using [docker images](https://github.com/PacificBiosciences/wdl-dockerfiles), which are hosted in PacBio's [quay.io](https://quay.io/organization/pacbio). Docker images and corresponding tool versions for current repo commit used for this workshop can be found [here](https://github.com/PacificBiosciences/HiFi-human-WGS-WDL/tree/b6a2cd27bc5cb762afd1a9891d622cdf29fb5f39#tool-versions-and-docker-images).
 
 To help BFX attendees understand better what the pipeline does for each step, i,e., which tool/command is invoked. We will do "hacked run": hack into the pipeline, run each analysis step using corresponding command lines with Singularity shell and pre-built docker image.
 
@@ -366,7 +361,7 @@ mkdir -p ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run
 
 ##### 1. Mapping HiFi reads to reference genome (GRCh38) 
 
-This step takes around 10 mins to finish. Unpatient attendees don't need to run this step by themselves, aligned bam is provided: `~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/HG002.GRCh38.chr7.10X.aligned.bam` for next step.
+This step takes around 10 mins to finish. Impatient attendees don't need to run this step by themselves, aligned bam is provided: `~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/HG002.GRCh38.chr7.10X.aligned.bam` for next step.
 
 ```bash
 singularity pull pbmm2.sif docker://quay.io/pacbio/pbmm2@sha256:1013aa0fd5fb42c607d78bfe3ec3d19e7781ad3aa337bf84d144c61ed7d51fa1

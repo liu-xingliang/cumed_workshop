@@ -84,6 +84,10 @@ Please follow the step-by-step instructions below:
 5. Click "open" to connect (Please choose "connect once" in the subsequent window, so putty will not save current host keys, which will cause some problem in current workshop AWS settings: dynamic IP for the EC2 instance).
 
 <p align="left">
+<img src="./img/putty_connectonce.svg" width="400">
+</p>
+
+<p align="left">
 <img src="./img/putty_terminal.svg" width="400">
 </p>
 

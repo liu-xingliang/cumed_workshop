@@ -7,7 +7,7 @@
 
 ## Download AWS EC2 private key
 
-Please use [cumed_user_key.ppk](https://github.com/liu-xingliang/cumed_workshop/blob/main/00.prerequisites/keys/cumed_user_key.ppk) uploaded to workshop github repository.
+Please use [cumed_user_key.ppk](https://github.com/liu-xingliang/cumed_workshop/blob/main/00.prerequisites/keys/cumed_user_key.ppk) uploaded to workshop github repository (Rigt-click and save).
 
 ## Access workshop EC2 server
 
@@ -40,6 +40,10 @@ For X64 (64-bit x86) system (most user should use this one), please download: [p
 </p>
 
 5. Click "open" to connect (Please choose "connect once" in the subsequent window, so putty will not save current host keys, which will cause some problem in current workshop AWS settings: dynamic IP for the EC2 instance).
+
+<p align="left">
+<img src="./img/putty_connectonce.svg" width="400">
+</p>
 
 <p align="left">
 <img src="./img/putty_terminal.svg" width="400">
