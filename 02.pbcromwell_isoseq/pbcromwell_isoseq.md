@@ -7,11 +7,11 @@ duration: 60 minutes
 
 ### Learning Objectives:
 
-* Understand key steps and main output of Iso-Seq pipeline for Kinnex bulk RNA seq
+* Understand key steps and main outputs of Iso-Seq pipeline for Kinnex bulk RNA seq
 * Understand how to run Iso-Seq pipeline with `pbcromwell` using Slurm job management system (JMS) on a high-performing computer (HPC)
 
 
-- [KinnexTM high-throughput RNA sequencing kit](#kinnextm-high-throughput-rna-sequencing-kit)
+- [Kinnex high-throughput RNA sequencing kit](#kinnex-high-throughput-rna-sequencing-kit)
 - [Pre-setting running environment](#pre-setting-running-environment)
   - [Installing SMRT Link v13 (EA)](#installing-smrt-link-v13-ea)
   - [Updating system `$PATH`](#updating-system-path)
@@ -29,9 +29,9 @@ duration: 60 minutes
 - [Executing Iso-Seq workflow using `pbcromwell`](#executing-iso-seq-workflow-using-pbcromwell)
 
 
-## Kinnex<sup>TM</sup> high-throughput RNA sequencing kit
+## Kinnex high-throughput RNA sequencing kit
 
-[Kinnex RNA Kits](https://www.pacb.com/press_releases/pacbio-announces-kinnex-rna-kits-further-scaling-hifi-sequencing-in-full-length-rna-single-cell-rna-and-16s-rrna-applications/) 
+The pipeline used in this session is for BFX analysis of high-throughput bulk RNA sequencing data using [Kinnex RNA Kits](https://www.pacb.com/press_releases/pacbio-announces-kinnex-rna-kits-further-scaling-hifi-sequencing-in-full-length-rna-single-cell-rna-and-16s-rrna-applications/) PacBio recently released.
 
 <!--
 ### setting up conda environment
@@ -58,7 +58,7 @@ mamba install pbpigeon=1.1.0
 With full installation of SMRT Link, user could access all command line tools needed for this demo. Besides, instead of a full SMRT Link installation with user interface and other modules, user could opt to only install command line with:
 
 ```bash
-export SMRT_ROOT=/home/ubuntu/softwares/smrtlink
+export SMRT_ROOT=/home/ubuntu/software/smrtlink
 ./smrtlink-${VERSION}.run --rootdir $SMRT_ROOT --smrttools-only
 ```
 
@@ -69,7 +69,7 @@ In this hands-on session, we only need command line tools of SMRT Link only.
 Add SMRT Link smrttools `bin` directory to $PATH env.
 
 ```bash
-export SMRT_ROOT=/home/ubuntu/softwares/smrtlink
+export SMRT_ROOT=/home/ubuntu/software/smrtlink
 export PATH=$SMRT_ROOT/install/smrtlink-release_13.0.0.203030/bundles/smrttools/current/private/otherbins/all/bin:$PATH
 ```
 
@@ -491,7 +491,7 @@ time pbmm2 align \
 # sys	0m34.101s
 ```
 
-Let's view transcripts consensus derived from `isoseq cluster2` mapping (pbmm2) to reference genome (`~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2/mapped.bam`) in IGV. Here, we use USP25, a >150k bp gene as example, there are multiple consensus are similar/identical, indicating over-splitted clusters (will be merged in `isoseq collapse`).
+Let's view transcripts consensus derived from `isoseq cluster2` mapping (pbmm2) to reference genome (`~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2/mapped.bam`) in IGV. Here, we use USP25, a >150k bp gene as example, there are multiple consensus sequences which are similar/identical, indicating over-splitted clusters (will be merged in `isoseq collapse`).
 
 <p align="left">
 <img src="./img/cluster2_mapped_bam_igv.svg" width="1000">
@@ -601,41 +601,41 @@ time pigeon report \
 # sys	0m0.038s
 ```
 
-Final pigeon output classification file is located at `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/isoseq_classification.filtered_lite_classification.txt`, with columns and example values in below table (a FSM isoform with alternative Transcription Start Site (TSS) and Transcription Termination Site (TTS) with column "subcategory": "alternative_3end5end" and "diff_to_TSS" and "diff_to_TTS" values provided. "fl_assoc" column keeps the number of reads (FLNC PacBio HiFi reads) supporting this isoform. For more info, please refer to SQANTI3 [docs](https://github.com/ConesaLab/SQANTI3/wiki/Understanding-the-output-of-SQANTI3-QC#glossary-of-classification-file-columns-classificationtxt).
+Final pigeon output classification file is located at `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/isoseq_classification.filtered_lite_classification.txt`, with columns and example values in below table: a FSM isoform with alternative Transcription Start Site (TSS) ("subcategory": "alternative_5end") and "diff_to_TSS" values provided. "fl_assoc" column keeps the number of reads (FLNC PacBio HiFi reads) supporting this isoform. For more info, please refer to SQANTI3 [docs](https://github.com/ConesaLab/SQANTI3/wiki/Understanding-the-output-of-SQANTI3-QC#glossary-of-classification-file-columns-classificationtxt).
 
 |columns|example_value|
 |---|---|
-|isoform|PB.1.1|
-|chrom|chr2|
-|strand|-|
-|length|1525|
-|exons|9|
+|isoform|PB.9.8|
+|chrom|chr21|
+|strand|-
+|length|1668|
+|exons|7
 |structural_category|full-splice_match|
-|associated_gene|MEMO1|
-|associated_transcript|ENST00000295065.9|
-|ref_length|4505|
-|ref_exons|9|
-|diff_to_TSS|213|
-|diff_to_TTS|2767|
-|diff_to_gene_TSS|31|
-|diff_to_gene_TTS|0|
-|subcategory|alternative_3end5end|
+|associated_gene|GATD3B|
+|associated_transcript|ENST00000620528.5|
+|ref_length|1584|
+|ref_exons|7
+|diff_to_TSS|-73|
+|diff_to_TTS|-11|
+|diff_to_gene_TSS|-29|
+|diff_to_gene_TTS|11|
+|subcategory|alternative_5end|
 |RTS_stage|FALSE|
 |all_canonical|canonical|
 |min_sample_cov|NA|
 |min_cov|NA|
 |min_cov_pos|NA|
 |sd_cov|NA|
-|FL.BioSample_1|3|
-|FL_TPM.BioSample_1|12.665816|
-|FL_TPM.BioSample_1_log10|1.102633|
+|FL.BioSample_1|852|
+|FL_TPM.BioSample_1|3597.092041|
+|FL_TPM.BioSample_1_log10|3.555952|
 |n_indels|NA|
 |n_indels_junc|NA|
 |bite|FALSE|
 |iso_exp|NA|
 |gene_exp|NA|
 |ratio_exp|NA|
-|FSM_class|A|
+|FSM_class|C
 |coding|non_coding|
 |ORF_length|NA|
 |CDS_length|NA|
@@ -644,9 +644,9 @@ Final pigeon output classification file is located at `/home/ubuntu/CUMED_BFX_wo
 |CDS_genomic_start|NA|
 |CDS_genomic_end|NA|
 |predicted_NMD|NA|
-|perc_A_downstream_TTS|45|
-|seq_A_downstream_TTS|AAAATAGTCTGATTTAAACT|
-|dist_to_CAGE_peak|668|
+|perc_A_downstream_TTS|15|
+|seq_A_downstream_TTS|ATTCATCTGTGTGTTCAGGG|
+|dist_to_CAGE_peak|NA|
 |within_CAGE_peak|FALSE|
 |dist_to_polyA_site|NA|
 |within_polyA_site|NA|
@@ -655,9 +655,49 @@ Final pigeon output classification file is located at `/home/ubuntu/CUMED_BFX_wo
 |polyA_motif_found|NA|
 |ORF_seq|NA|
 |ratio_TSS|NA|
-|fl_assoc|3|
+|fl_assoc|852|
 |cell_barcodes|NA|
 
+
+If we `pbmm2` final isoform sequences (from `isoseq collapse`) to reference genome: 
+
+```bash
+time pbmm2 align \
+    --sort \
+    --preset ISOSEQ \
+    -j 4 \
+    /home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/Human_hg38_Gencode_v39/Human_hg38_Gencode_v39.referenceset.xml \
+    /home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_collapse/collapse_isoforms.fasta \
+    collapse_isoforms.mapped.sorted.bam
+
+# >|> 20231125 10:43:23.016 -|- WARN -|- CheckPositionalArgs -|- 0x7fd42870bc40|| -|- Input is FASTA. Output BAM file cannot be used for polishing with GenomicConsensus!
+
+# real	8m25.139s
+# user	4m51.736s
+# sys	0m24.837s
+```
+
+Load the alignment to IGV and select corresponding isoform sequences (name is a bit different in `isoseq collapse` fasta): "PB.9.8|PB.9.8:5116330-5128442(-)|BioSample_1_transcript/71730"
+
+<p align="center">
+<img src="./img/filtered_isoform_igv.svg" width="1000">
+</p>
+
+Besides this known isoform, isoseq also detected a bunch of novel isoforms associating to GATD3B (NM_001363758.2):
+
+```bash
+awk -F"\t" '$7=="GATD3B"{print $6}' isoseq_classification.filtered_lite_classification.txt | sort | uniq -c
+      8 full-splice_match
+     12 incomplete-splice_match
+     14 novel_in_catalog
+     18 novel_not_in_catalog
+```
+
+With Sashimi plot showing structures of GATD3B associated isoforms:
+
+<p align="center">
+<img src="./img/sashimi.svg" width="1000">
+</p>
 
 Attendees could view pigeon output JSON file: `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/isoseq_classification.filtered.report.json` for more useful numbers:
 
@@ -794,30 +834,71 @@ Attendees could view pigeon output JSON file: `/home/ubuntu/CUMED_BFX_workshop/0
 }
 ```
 
+For how many isoforms got filtered in `isoseq filter`, attendees could check `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/pigeon-filter.log`, for example, ~30% of `isoform collapse` isoforms got excluded because of Intrapriming, RT (reverse transcriptase) Switching and LowCoverage/Non-Canonical:
+
+<p align="center">
+<img src="./img/filter_reason.svg" width="1500">
+</p>
+
+
+```bash
+cat /home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_pigeon/pigeon-filter.log
+
+| 20231113 09:34:07.317 | INFO | Classifications
+| 20231113 09:34:07.317 | INFO |   - Input   : 20015
+| 20231113 09:34:07.317 | INFO |   - Passed  : 6980 (34.87%)
+| 20231113 09:34:07.317 | INFO |   - Removed : 13035 (65.13%)
+| 20231113 09:34:07.317 | INFO | 
+| 20231113 09:34:07.317 | INFO | Junctions
+| 20231113 09:34:07.317 | INFO |   - Input   : 87297
+| 20231113 09:34:07.317 | INFO |   - Passed  : 61454 (70.4%)
+| 20231113 09:34:07.317 | INFO |   - Removed : 25843 (29.6%)
+| 20231113 09:34:07.317 | INFO | 
+| 20231113 09:34:07.317 | INFO | Isoforms
+| 20231113 09:34:07.317 | INFO |   - Input   : 87297
+| 20231113 09:34:07.317 | INFO |   - Passed  : 61454 (70.4%)
+| 20231113 09:34:07.317 | INFO |   - Removed : 25843 (29.6%)
+| 20231113 09:34:07.317 | INFO | 
+| 20231113 09:34:07.317 | INFO | Filter Reasons
+| 20231113 09:34:07.317 | INFO |   - Intrapriming              : 6780 (52.01%)
+| 20231113 09:34:07.317 | INFO |   - RT Switching              : 255 (1.956%)
+| 20231113 09:34:07.317 | INFO |   - LowCoverage/Non-Canonical : 6000 (46.03%)
+| 20231113 09:34:07.317 | INFO |   - Mono-exonic               : 0 (0%)
+| 20231113 09:34:07.318 | INFO | 
+| 20231113 09:34:07.318 | INFO | Run Time : 730ms 60us 
+| 20231113 09:34:07.318 | INFO | CPU Time : 725ms 742us 
+| 20231113 09:34:07.318 | INFO | Peak RSS : 0.010 GB
+```
+
+For Intrapriming (early dT priming off A-stretch):
+
+<p align="center">
+<img src="./img/intra_priming.svg" width="1500">
+</p>
+
+
+For RT Switching (RT switching from one repat to the other in the RNA template, a secondary structure bring two repeats closer will enhance this):
+
+<p align="center">
+<img src="./img/rt_switching.svg" width="1500">
+</p>
+
+For details of other filters, please check SQANTI3
+
 ## Executing Iso-Seq workflow using `pbcromwell`
 
 The whole workflow is built with WDL, hence can be executed using [Cromwell](https://github.com/broadinstitute/cromwell) engine. 
 
-`pbcromwell` is PacBio command-line utility for running Cromwell workflows, plus advanced
-utilities for interacting directly with a Cromwell server.  It is primarily intended for developers and power users.
+`pbcromwell` is PacBio command-line utility for running Cromwell workflows, plus advanced utilities for interacting directly with a Cromwell server.  It is primarily intended for developers and power users. `pbcromwell` is primarily designed for running workflows distributed and supported by PacBio, but it is written to **handle any valid WDL source (version 1.0)**. What is more, `pbcromwell` does **not** interact with SMRT Link services, so it does not need SMRT Link service to run.
 
-`pbcromwell` is primarily designed for running workflows distributed and supported
-by PacBio, but it is written to **handle any valid WDL source (version 1.0)**, and
-is very flexible in how it takes input.  PacBio workflows are expected to be
-found in the directory defined by the `SMRT_PIPELINE_BUNDLE_DIR` (e.g., `$SMRT_ROOT/install/smrtlink-release_13.0.0.203030/bundles/smrttools/install/smrttools-release_13.0.0.203030/private/pacbio/pbpipeline-resources`) environment
-variable, which is automatically defined by the SMRT Link distribution.
+PacBio workflows are expected to be found in the directory of `$SMRT_ROOT/install/smrtlink-release_13.0.0.203030/bundles/smrttools/install/smrttools-release_13.0.0.203030/private/pacbio/pbpipeline-resources`.
 
-What is more, `pbcromwell` does **not** interact with SMRT Link services, but interacting
-with the Cromwell server.
-
-Attendees could compare result files of `pbcromwell_run` and `hacked_run` to see the differences.
+Running pipeline for demo dataset using `pbcromwell` took ~20 mins wall time. It has already been executed with results saved at `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/pbcromwell_run/cromwell_job`:
 
 ```bash
 # config cromwell to use call-caching and Slurm backend
 pbcromwell configure --cache --default-backend SLURM
 
-# pbcromwell \
-#   run pb_segment_reads_and_isoseq \
 pbcromwell \
   --log-level INFO \
   --log-file pb_isoseq.log \
@@ -858,3 +939,19 @@ pbcromwell \
 	"pb_isoseq.tmp_dir":"/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/pbcromwell_run/tmp_dir"
 }
 ```
+
+Attendees could also try to run the pipeline using following commands (with new output folder, e.g., `--output-dir cromwell_job_rerun` and new log file, e.g., `--log-file pb_isoseq_rerun.log`):
+
+```bash
+pbcromwell \
+  --log-level INFO \
+  --log-file pb_isoseq_rerun.log \
+  run pb_isoseq \
+  -i inputs.json \
+  --config cromwell.conf \
+  --backend SLURM \
+  --queue "compute" \
+  --overwrite \
+  --output-dir cromwell_job_rerun
+```
+
