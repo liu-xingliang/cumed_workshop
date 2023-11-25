@@ -492,8 +492,28 @@ time /pharmcat/pharmcat \
 # sys	0m0.468s
 ```
 
-Attendees could download `/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/hacked_run/pharmcat/NA02016.preprocessed.filtered.report.html` to view pharmacogenomics annotation from PharmCAT.
+`pharmcat` is used to detect PGx star alleles (different haplotypes of genes carrying a specific combination of variants, e.g., [CYP2D6 star alleles defined in PharmVar](https://www.pharmvar.org/gene/CYP2D6).
 
+The demo sample (NA02016) does not have CYP2D6 star alleles. For those samples with [CYP2D6 PGx star alleles](https://files.cpicpgx.org/data/report/current/allele_definition/CYP2D6_allele_definition_table.xlsx) (for other PGx genes: https://www.pharmgkb.org/page/pgxGeneRef) detected in pre-cooked pipeline run, attendees could download PharmCAT report htmls to view pharmacogenomics annotation:
+
+```bash
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA07439/pharmcat/NA07439.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA09301/pharmcat/NA09301.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA12244/pharmcat/NA12244.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA16654/pharmcat/NA16654.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17039/pharmcat/NA17039.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17073/pharmcat/NA17073.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17114/pharmcat/NA17114.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17209/pharmcat/NA17209.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17211/pharmcat/NA17211.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17215/pharmcat/NA17215.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17217/pharmcat/NA17217.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17226/pharmcat/NA17226.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17227/pharmcat/NA17227.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17232/pharmcat/NA17232.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17276/pharmcat/NA17276.preprocessed.filtered.report.html
+/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/batches/CYP2D6_PGx_SQIIe/NA17282/pharmcat/NA17282.preprocessed.filtered.report.html
+```
 
 ## Running pipeline using Snakemake + Slurm
 
