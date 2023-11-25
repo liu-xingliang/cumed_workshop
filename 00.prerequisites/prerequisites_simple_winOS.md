@@ -1,5 +1,6 @@
 - [Download AWS EC2 private key](#download-aws-ec2-private-key)
 - [Access workshop EC2 server](#access-workshop-ec2-server)
+  - [0. Download Putty](#0-download-putty)
   - [1. Connecting to EC2 workshop server using Putty](#1-connecting-to-ec2-workshop-server-using-putty)
   - [2. Connecting to Ubuntu desktop using RealVNC](#2-connecting-to-ubuntu-desktop-using-realvnc)
   - [(Optional) FileZilla client](#optional-filezilla-client)
@@ -7,15 +8,21 @@
 
 ## Download AWS EC2 private key
 
-Please use [cumed_user_key.ppk](https://github.com/liu-xingliang/cumed_workshop/blob/main/00.prerequisites/keys/cumed_user_key.ppk) uploaded to workshop github repository.
+Please use [cumed_user_key.ppk](https://github.com/liu-xingliang/cumed_workshop/blob/main/00.prerequisites/keys/cumed_user_key.ppk) uploaded to workshop github repository (click the link and download file using top-right corner button indicated below in red box).
+
+<p align="left">
+<img src="./img/download_ppk.svg" width="1000">
+</p>
 
 ## Access workshop EC2 server
 
-For X64 (64-bit x86) system (most user should use this one), please download: [putty](https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe). For other architectures, please find corresponding binaries [here](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html).
+### 0. Download Putty
+
+Download: [putty](https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe) to your desktop and open it.
 
 ### 1. Connecting to EC2 workshop server using Putty
 
-1. Specify host name: `server_$(printf "%03d" N).cumed-workshop.com`, where `N` is a number between 1 and 30 (30 attendees), i.e., "server_001.cumed-workshop.com", "server_002.cumed-workshop.com", ..., "server_030.cumed-workshop.com"
+1. Specify host name: server_XXX.cumed-workshop.com.
 
 <p align="left">
 <img src="./img/putty_hostname.svg" width="400">
@@ -51,16 +58,16 @@ For X64 (64-bit x86) system (most user should use this one), please download: [p
 
 ### 2. Connecting to Ubuntu desktop using RealVNC
 
-For x64 system, download [VNC-Viewer-7.8.0-Windows-64bit.exe](https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Windows-64bit.exe). Other architectures, please check the [download page](https://www.realvnc.com/en/connect/download/viewer/windows/). While connecting to the remote server using VNC through "localhost:5901", please **keep the putty ssh session alive**.
-
-In putty terminal, please do:
+Please **keep the above putty ssh session alive**. In putty terminal, please do:
 
 ```bash
-vncserver -kill :1
+vncserver -kill :1 # ignore message: "Can't find file /home/ubuntu/.vnc/ip-XXX-XXX-XXX-XXX:1.pid", it means you don't have previous VNC session alive on chanel :1
 vncserver -localhost -geometry 1600x1200
 ```
 
-Then, open RealVNC and input "localhost:5901" in the address bar:
+Download [VNC-Viewer-7.8.0-Windows-64bit.exe](https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Windows-64bit.exe). 
+
+Open RealVNC and input "localhost:5901" in the address bar:
 
 <p align="left">
 <img src="./img/windows_vnc.svg" width="400">
@@ -72,22 +79,17 @@ And click "continue" to proceed:
 <img src="./img/realvnc_continue.svg" width="400">
 </p>
 
-Password is "ubuntu":
+Password is "ubuntu" (can save if for next login):
 
 <p align="left">
 <img src="./img/realvnc_password.svg" width="400">
 </p>
 
-_PS: If attendees get VNC connection issues, please set up a fresh VNC session by running below commands on EC2 server:_
-
-```bash
-vncserver -kill :1
-vncserver -localhost -geometry 1600x1200
-```
-
 ### (Optional) FileZilla client
 
-For x64 system, download [win64 installer](https://filezilla-project.org/download.php?platform=win64). For attendees use a lab PC **without** "Administrator" access:
+**During workshop, attendees don't need to download file to local PC for visualization, IGV is installed on workshop server.**
+
+Download [win64 installer](https://filezilla-project.org/download.php?platform=win64) and install it in  non-Administrator mode:
 
 1. Initiate the installation.
 
@@ -101,13 +103,13 @@ For x64 system, download [win64 installer](https://filezilla-project.org/downloa
 <img src="./img/filezilla/2_dont_need_admin.svg" width="400">
 </p>
 
-3. Only install for "me".
+3. Only for "me".
 
 <p align="left">
 <img src="./img/filezilla/3_agree_onlyforme.svg" width="800">
 </p>
 
-4. Specify a local folder to which current non-Admin user has access (e.g., Desktop).
+4. Specify a folder current non-Admin user has access to (e.g., Desktop).
 
 <p align="left">
 <img src="./img/filezilla/4_allcomp_choosefolder.svg" width="1000">
