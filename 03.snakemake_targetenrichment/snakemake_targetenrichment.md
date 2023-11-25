@@ -15,6 +15,11 @@ duration: 60 minutes
   - [Downsampling](#downsampling)
   - [Preparing de-duplicated HiFi alignment](#preparing-de-duplicated-hifi-alignment-1)
 - [Running pipeline using Snakemake + Slurm](#running-pipeline-using-snakemake--slurm)
+  - [1. Downloading pipeline repository](#1-downloading-pipeline-repository)
+  - [2. Preparing auxiliary sub-folders](#2-preparing-auxiliary-sub-folders)
+  - [3. Updating workflow/config.yaml](#3-updating-workflowconfigyaml)
+  - [4. Updating workflow/cluster.yaml](#4-updating-workflowclusteryaml)
+  - [4. Executing pipeline](#4-executing-pipeline)
 - [Step-by-step execution of pipeline key steps (hacked run)](#step-by-step-execution-of-pipeline-key-steps-hacked-run)
   - [1. pbsv](#1-pbsv)
   - [2. deepvariant](#2-deepvariant)
@@ -162,6 +167,10 @@ done
 
 PacBio HiFi target enrichment snakemake workflow is usually run with Slurm and due to slim computing resouces available on workshop servers, it will take time to finish. Therefore, we will not run this session but providing scripts for attendees' reference.
 
+There are two ways to run this pipeline. In this hands-on session, as we start from mapped bam files for each sample (barcodes trimmed and demultiplexed) with PCR duplicates marked, therefore, we need to run `workflow/run_snakemake_SLmapped.sh`. If users start from raw HiFi reads before barcode trimming and demultiplexing, `workflow/run_snakemake.sh` with barcode information is required. Please refer to [detailed run guidance](https://github.com/PacificBiosciences/HiFiTargetEnrichment/tree/master#detailed-run-guidance).
+
+### 1. Downloading pipeline repository
+
 ```bash
 conda activate snakemake_targetenrichment
 git clone https://github.com/PacificBiosciences/HiFiTargetEnrichment.git workflow
@@ -172,15 +181,111 @@ git show HEAD
 # Author: jrharting <jharting@pacificbiosciences.com>
 # Date:   Thu Mar 23 13:31:06 2023 -0700
 cd .. 
+```
 
+### 2. Preparing auxiliary sub-folders
+
+```bash
 mkdir -p reference annotation cluster_logs tmp
+```
 
-# run pipeline
-# skip demultiplexing
-# update workflow/config.yaml
-# cp workflow/config.yaml workflow/config.yaml.CYP2D6_PGx_SQIIe
-# update workflow/cluster.yaml
-# run just variant calling and phasing for a set of bams following demux/markdup/mapping on SL
+### 3. Updating workflow/config.yaml
+
+Here is the example configuration file used for workshop demo.
+
+```yaml
+# temporary storage
+tmpdir : '/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/tmp'
+
+# demux
+# NOTE: barcodes fasta is not required for workflow/run_snakemake_SLmapped.sh
+barcodes : '/no/need/for/SLmapped_run'
+
+# deepvariant
+DEEPVARIANT_VERSION : '1.4.0'
+N_SHARDS            : 4
+
+# reference
+# NOTE: reference files need to be prepared in advance and put in reference/ auxiliary sub-folder we just created. Update reference/ path accordingly.
+ref :
+  shortname   : 'GRCh38_noalt'
+  fasta       : '/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/reference/human_GRCh38_no_alt_analysis_set.fasta'
+  index       : '/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/reference/human_GRCh38_no_alt_analysis_set.fasta.fai'
+  chr_lengths : '/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/reference/human_GRCh38_no_alt_analysis_set.chr_lengths.txt'  # cut -f1,2 reference.fasta.fai > reference.chr_lengths.txt
+  tr_bed      : '/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/workflow/aux/tandem_repeats.bed'
+  exons       : '/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/workflow/aux/all_hg38_exons_ensembl.bed'
+
+# glnexus
+# NOTE: skip cohort analysis for this demo
+run_cohort: False
+GLNEXUS_VERSION : 'v1.4.1'
+merge : 1000000
+
+# extra
+# NOTE: skip QC for this demo
+QC :
+  runQC  : False
+  lowcov : 10
+
+picard :
+  near_distance : 5000
+  sample_size   : 1000
+
+pharmcat:
+  run_analysis: True
+  positions: '/home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/workflow/aux/pharmcat_positions.vcf.bgz'
+  mincov: 10
+
+# NOTE: skip annotation for this demo, otherwise need to prepare annotation file annotation/00-All.fixed_chr_PGx_only.vcf.gz, it is not included in github repository, might need to contact pipeline author for that
+annotate:
+    variants: 'annotation/00-All.fixed_chr_PGx_only.vcf.gz'
+    gVCF: False
+```
+
+### 4. Updating workflow/cluster.yaml
+
+Please be noted the difference between demo `cluster.yaml` and [original file](https://github.com/PacificBiosciences/HiFiTargetEnrichment/blob/master/cluster.yaml). In this demo, we disable GPU support and tune down no. of CPUs of each step to fit limited resources on demo servers.
+
+```yaml
+__default__:
+  partition: compute
+  cpus: 1
+  extra: ''
+  out: cluster_logs/slurm-%x-%j-%N.out
+demux_ubam:
+  cpus: 4
+demux_fastq:
+  cpus: 4
+markdup_ubam:
+  cpus: 4
+markdup_fastq:
+  cpus: 4
+pbmm2_align_ubam:
+  cpus: 4
+pbmm2_align_fastq:
+  cpus: 4
+bgzip_vcf:
+  cpus: 2
+deepvariant_make_examples:
+  cpus: 1
+deepvariant_call_variants:
+  cpus: 4
+deepvariant_postprocess_variants:
+  cpus: 4
+deepvariant_bcftools_stats:
+  cpus: 4
+samtools_index_bam_haplotag:
+  cpus: 4
+merge_haplotagged_bams:
+  cpus: 4
+samtools_index_merged_bam:
+  cpus: 4
+```
+
+### 4. Executing pipeline 
+
+```bash
+# run just variant calling and phasing for a set of bams following demux/markdup/mapping on SMRT Link (SL)
 # <hifi_reads> can be a directory of bams or a textfile with one bam path per line (fofn)
 # update workflow/run_snakemake_SLmapped.sh
 #   remove: --singularity-args '--nv ', as not running with GPU
@@ -241,21 +346,33 @@ Use NA02016 as an example.
 ### 1. pbsv
 
 ```bash
-mamba env create -n TE.pbsv --file ../snakemake_run/workflow/rules/envs/pbsv.yaml
+# mamba env create -n TE.pbsv --file ../snakemake_run/workflow/rules/envs/pbsv.yaml
 mamba activate TE.pbsv
 
 pbsv --version
 # pbsv 2.8.0 (commit SL-release-10.2.0-8-g20b8f57)
 
 mkdir -p pbsv/svsig
-time pbsv discover --hifi --log-level INFO --tandem-repeats /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/workflow/aux/tandem_repeats.bed /home/ubuntu/cumed_bfx_workshop/03.snakemake_targetenrichment/data/pbmarkdup.grch38.sorted.bam/na02016.pbmarkdup.grch38.sorted.bam pbsv/svsig/NA02016.GRCh38_noalt.svsig.gz
+time pbsv discover \
+    --hifi \
+    --log-level INFO \
+    --tandem-repeats /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/workflow/aux/tandem_repeats.bed \
+    /home/ubuntu/cumed_bfx_workshop/03.snakemake_targetenrichment/data/pbmarkdup.grch38.sorted.bam/na02016.pbmarkdup.grch38.sorted.bam \
+    pbsv/svsig/NA02016.GRCh38_noalt.svsig.gz
 
 # real	0m0.192s
 # user	0m0.083s
 # sys	0m0.009s
 
 mkdir -p pbsv
-time pbsv call --hifi -m 20 --log-level INFO --num-threads 4 /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/reference/human_GRCh38_no_alt_analysis_set.fasta pbsv/svsig/NA02016.GRCh38_noalt.svsig.gz pbsv/NA02016.GRCh38_noalt.pbsv.vcf
+time pbsv call \
+    --hifi \
+    -m 20 \
+    --log-level INFO \
+    --num-threads 4 \
+    /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/reference/human_GRCh38_no_alt_analysis_set.fasta \
+    pbsv/svsig/NA02016.GRCh38_noalt.svsig.gz \
+    pbsv/NA02016.GRCh38_noalt.pbsv.vcf
 
 # real	2m7.686s
 # user	0m12.493s
@@ -325,9 +442,13 @@ time /opt/deepvariant/bin/postprocess_variants \
 # user	0m2.072s
 # sys	0m0.495s
 
-mamba env create -n TE.bcftools --file ../snakemake_run/workflow/rules/envs/bcftools.yaml
+# mamba env create -n TE.bcftools --file ../snakemake_run/workflow/rules/envs/bcftools.yaml
 mamba activate TE.bcftools
-time bcftools stats --threads 4 --fasta-ref /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/reference/human_GRCh38_no_alt_analysis_set.fasta --apply-filters PASS -s NA02016 deepvariant/NA02016.GRCh38_noalt.deepvariant.vcf.gz > deepvariant/NA02016.GRCh38_noalt.deepvariant.vcf.stats.txt
+time bcftools stats \
+    --threads 4 \
+    --fasta-ref /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/reference/human_GRCh38_no_alt_analysis_set.fasta \
+    --apply-filters PASS \
+    -s NA02016 deepvariant/NA02016.GRCh38_noalt.deepvariant.vcf.gz > deepvariant/NA02016.GRCh38_noalt.deepvariant.vcf.stats.txt
 
 # real	0m0.050s
 # user	0m0.021s
@@ -339,7 +460,7 @@ time bcftools stats --threads 4 --fasta-ref /home/ubuntu/CUMED_BFX_workshop/03.s
 TE pipeline still uss whatshap for (small) variants phasing.
 
 ```bash
-mamba env create -n TE.whatshap --file ../snakemake_run/workflow/rules/envs/whatshap.yaml
+# mamba env create -n TE.whatshap --file ../snakemake_run/workflow/rules/envs/whatshap.yaml
 mamba activate TE.whatshap
 
 mkdir -p whatshap
@@ -415,7 +536,7 @@ time whatshap haplotag --tag-supplementary --ignore-read-groups \
 # user	0m0.803s
 # sys	0m0.287s
 
-mamba env create -n TE.samtools --file ../snakemake_run/workflow/rules/envs/samtools.yaml
+# mamba env create -n TE.samtools --file ../snakemake_run/workflow/rules/envs/samtools.yaml
 mamba activate TE.samtools
 
 samtools --version
@@ -457,7 +578,7 @@ samtools index -@ 4 whatshap/NA02016.GRCh38_noalt.deepvariant.haplotagged.bam
 
 ```bash
 # force to use python 3.9.18 instead of >=3.9 as it seems python 3.10+ has some problems with pangu 0.2.2
-mamba env create -n TE.pangu --file ../snakemake_run/workflow/rules/envs/pangu.yaml
+# mamba env create -n TE.pangu --file ../snakemake_run/workflow/rules/envs/pangu.yaml
 mamba activate TE.pangu
 
 mkdir -p pangu/NA02016/
@@ -483,7 +604,7 @@ mkdir -p pharmcat
     -bf NA02016 \
     -o pharmcat
 
-# mamba env create -n TE.samtools --file ../snakemake_run/workflow/rules/envs/samtools.yaml
+# # mamba env create -n TE.samtools --file ../snakemake_run/workflow/rules/envs/samtools.yaml
 mamba activate TE.samtools
 
 bedtools coverage \

@@ -8,7 +8,7 @@ duration: 60 minutes
 ### Learning Objectives:
 
 * Understand key steps and main output of Iso-Seq pipeline for Kinnex bulk RNA seq
-* Understand how to run Iso-Seq pipeline with `pbcromwell` on using Slurm job management system (JMS) on a high-performing computer (HPC)
+* Understand how to run Iso-Seq pipeline with `pbcromwell` using Slurm job management system (JMS) on a high-performing computer (HPC)
 
 
 - [KinnexTM high-throughput RNA sequencing kit](#kinnextm-high-throughput-rna-sequencing-kit)
