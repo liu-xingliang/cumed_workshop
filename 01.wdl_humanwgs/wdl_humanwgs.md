@@ -407,6 +407,9 @@ time pbmm2 align \
 # real	9m54.419s
 # user	29m40.374s
 # sys	0m13.058s
+
+# exit Singularity shell
+exit
 ```
 
 Though down-sampled input HiFi reads are derived from reads mapping to chr7 in a full-set (30X) pbmm2 alignment to GRCh38 using same version of pbmm2: v1.10.0 (commit v1.10.0).
@@ -648,12 +651,18 @@ time pbsv call \
 
 bgzip /mnt/out/call_pbsv/HG002.GRCh38.chr7.10X.pbsv.vcf
 tabix -p vcf /mnt/out/call_pbsv/HG002.GRCh38.chr7.10X.pbsv.vcf.gz
+
+# exit Singularity shell
+exit
 ```
 
-Attendees could take a quick look at SV vcf in Bash shell:
+Attendees could take a quick look at SV signatures and SV vcf in Bash shell:
 
 ```bash
-zless -S /mnt/out/call_pbsv/HG002.GRCh38.chr7.10X.pbsv.vcf.gz
+# z* command is for gz format
+# less -S displays each raw in one line (key shortcuts: "f" for scrolling down and "b" for scrolling up, "left" and "right" for moving left and right)
+zless -S ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_pbsv/HG002.GRCh38.chr7.10X.aligned.svsig.gz
+zless -S ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_pbsv/HG002.GRCh38.chr7.10X.pbsv.vcf.gz
 ```
 
 And check specific SV using [IGV](https://igv.org/doc/desktop/#DownloadPage/). IGV has already been downloaded to your server, to lanuch IGV on the server:
@@ -697,16 +706,15 @@ As we only have one vcf for chr7, therefore skip this step.
 
 ##### 4. deepvariant
 
+> _DeepVariant has 3 stages: make examples, call variants, and postprocess variants. The middle stage is when the deep neural network does its classification, while the first stage prepares data for the neural network, and the last stage interprets the classifications output by the neural network as variant calls_.
+
+For more details, please refer to DV doc: [looking-through-deepvariants-eyes](https://google.github.io/deepvariant/posts/2020-02-20-looking-through-deepvariants-eyes/).
+
 ###### make_examples
 
 `make_examples` consumes reads and the reference genome to create TensorFlow examples for evaluation with the deep learning models.
 
-`make_examples` is a **single-threaded program** using 1-2 GB of RAM. The execution time for the demo dataset is ~30 mins (even with `--regions "chr7"` to reduce the number of examples generated) on slim workshop servers (4 CPUs). This is long for this 1.5 hrs session, therefore two results folders: `example_tfrecords` and `nonvariant_site_tfrecords` for this step have been uploaded to demo run results folder: `~/CUMED_BFX_workshop/01.wdl_humanwgs/call_deepvariant/example_tfrecords.backup/` and  `~/CUMED_BFX_workshop/01.wdl_humanwgs/call_deepvariant/nonvariant_site_tfrecords.backup/`. To skip this step and continue with subsequent steps, attendees just need to update the results folders' name:
-
-```bash
-ln -s ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/example_tfrecords.backup ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/example_tfrecords
-ln -s ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/nonvariant_site_tfrecords.backup ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_deepvariant/nonvariant_site_tfrecords
-```
+`make_examples` is a **single-threaded program** using 1-2 GB of RAM. The execution time for the demo dataset is ~30 mins (even with `--regions "chr7"` to reduce the number of examples generated) on slim workshop servers (4 CPUs). This is long for this 1.5 hrs session, therefore two results folders: `example_tfrecords` and `nonvariant_site_tfrecords` for this step have been uploaded to demo run results folder: `~/CUMED_BFX_workshop/01.wdl_humanwgs/call_deepvariant/example_tfrecords` and  `~/CUMED_BFX_workshop/01.wdl_humanwgs/call_deepvariant/nonvariant_site_tfrecords`.
 
 To increase the level of parallelism, `make_examples` supports sharding of its input and output via the `--task` argument with a sharded output specification. Below is the `make_examples` commands used in the pipeline (of course, the number of shards and parallel jobs for a full Human WGS dataset, e.g., 30X dataset, will be larger and the pipeline does not need singularity shell for each command):
 
@@ -746,8 +754,6 @@ time seq 0 15 | parallel --jobs 4 /opt/deepvariant/bin/make_examples \
 # user	97m55.869s
 # sys	0m27.740s
 ```
-
-For more details of what `make_examples` does, please refer to the [deepvariant docs](https://google.github.io/deepvariant/posts/2020-02-20-looking-through-deepvariants-eyes/).
 
 ###### call_variants (CPU only)
 
@@ -842,7 +848,7 @@ Parses VCF or BCF and produces stats which can be plotted using plot-vcfstats.
 
 `bcftools roh`
 
-HMM model for detecting runs of autozygosity.
+HMM model for detecting runs of autozygosity (ROH).
 
 ```bash
 # singularity pull bcftools.sif docker://quay.io/pacbio/bcftools@sha256:36d91d5710397b6d836ff87dd2a924cd02fdf2ea73607f303a8544fbac2e691f
@@ -914,7 +920,7 @@ plot-vcfstats -p /mnt/out/call_bcftools /mnt/out/call_bcftools/HG002.GRCh38.deep
 Above command generates plotting scripts of python3, docker image does not provide python3 to do the actual plotting, therefore need to run:
 
 ```bash
-mamba create -n plot-vcfstats 
+# mamba create -n plot-vcfstats 
 mamba activate plot-vcfstats
 
 python3 --version
@@ -1317,7 +1323,7 @@ awk -F"\t" 'NR==1 || $1=="chr7"' ~/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run
 
 ##### 11. Copy number variant (CNV) calling with HiFiCNV.
 
-[HiFiCNV](https://github.com/PacificBiosciences/HiFiCNV) is a CNV caller optimized for HiFi reads.
+[HiFiCNV](https://github.com/PacificBiosciences/HiFiCNV) is a CNV caller optimized for HiFi reads. This step took some time to run, hence with result files provided: `/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs/hacked_run/call_hificnv/`.
 
 ```bash
 # singularity pull hificnv.sif docker://quay.io/pacbio/hificnv@sha256:19fdde99ad2454598ff7d82f27209e96184d9a6bb92dc0485cc7dbe87739b3c2
@@ -1369,11 +1375,13 @@ echo -e "chr7\t58100000\t62100000" | bedtools intersect -a <(zcat ~/CUMED_BFX_wo
 # chr7	61964001	.	N	<DEL>	62	PASS	IMPRECISE;SVTYPE=DEL;END=62102000;SVLEN=138000;CIPOS=-2000,2000;CIEND=-2000,2000	GT:CN	0/1:0
 ```
 
-When we visualize them in IGV (e.g., the first one in above CNV list, "red" region in IGV cytoband), we did see the drop of coverage and minor allele frequecy (given the deepvariant variants provided):
+When we visualize them in IGV (e.g., the first one in above CNV list, "red" region in IGV cytoband), we did see the drop of coverage:
 
 <p align="left">
 <img src="./img/hificnv_chr7_loss.svg" width="1000">
 </p>
+
+MAF track derived from deepvariant (DV) variants is also provided, but DV didn't call variants in this region due to shallow coverage.
 
 As a side note, for above demo, we excluded all chrs but chr7 in HiFiCNV calling, but the pipeline use a more comprehensive excluded regions by default. HiFiCNV excluded regions included in `dataset/` folder were built with following scripts (done already):
 
