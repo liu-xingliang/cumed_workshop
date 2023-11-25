@@ -2265,6 +2265,55 @@ mkdir -p slurm_run
 miniwdl run HiFi-human-WGS-WDL/workflows/main.wdl -i input.full_path.json --verbose --cfg miniwdl.slurm.cfg -d slurm_run
 ```
 
+Pre-cooked `slurm_run/` folder is located at `/home/ubuntu/CUMED_BFX_workshop/01.wdl_humanwgs` for user to check pipeline output structures.
+
+```bash
+tree -dL 1 slurm_run/_LAST/out
+
+slurm_run/_LAST/out
+├── bam_stats
+├── cohort_hiphase_blocks
+├── cohort_hiphase_stats
+├── cohort_small_variant_vcf
+├── cohort_sv_vcf
+├── compound_het_small_variant_tsv
+├── compound_het_small_variant_vcf
+├── cpg_pileup_beds
+├── cpg_pileup_bigwigs
+├── filtered_small_variant_tsv
+├── filtered_small_variant_vcf
+├── filtered_svpack_tsv
+├── filtered_svpack_vcf
+├── haplotagged_bam_mosdepth_region_bed
+├── haplotagged_bam_mosdepth_summary
+├── hificnv_copynum_bedgraphs
+├── hificnv_depth_bws
+├── hificnv_maf_bws
+├── hificnv_vcfs
+├── merged_haplotagged_bam
+├── paraphase_output_jsons
+├── paraphase_realigned_bams
+├── paraphase_vcfs
+├── read_length_summary
+├── read_quality_summary
+├── sample_hiphase_blocks
+├── sample_hiphase_haplotags
+├── sample_hiphase_stats
+├── sample_phased_small_variant_vcfs
+├── sample_phased_sv_vcfs
+├── small_variant_gvcfs
+├── small_variant_roh_bed
+├── small_variant_roh_out
+├── small_variant_vcf_stats
+├── trgt_dropouts
+├── trgt_repeat_vcf
+└── trgt_spanning_reads
+
+37 directories
+```
+
+
+
 <!--
 Here, we use a "slim" version of [original pipeline](https://github.com/PacificBiosciences/HiFi-human-WGS-WDL/tree/b6a2cd27bc5cb762afd1a9891d622cdf29fb5f39) using less number of cpus for current demo analysis. The slim pipeline could be found at: https://github.com/liu-xingliang/HiFi-human-WGS-WDL.slim with updates [here](https://github.com/liu-xingliang/HiFi-human-WGS-WDL.slim/compare/b6a2cd2...d453168).
 
@@ -2377,50 +2426,3 @@ git push -u origin main
 ```
 -->
 
-<!--
-### Key outputs
-
-```bash
-tree -dL 1 out
-out
-├── bam_stats
-├── cohort_hiphase_blocks
-├── cohort_hiphase_stats
-├── cohort_small_variant_vcf
-├── cohort_sv_vcf
-├── compound_het_small_variant_tsv
-├── compound_het_small_variant_vcf
-├── cpg_pileup_beds
-├── cpg_pileup_bigwigs
-├── filtered_small_variant_tsv
-├── filtered_small_variant_vcf
-├── filtered_svpack_tsv
-├── filtered_svpack_vcf
-├── haplotagged_bam_mosdepth_region_bed
-├── haplotagged_bam_mosdepth_summary
-├── hificnv_copynum_bedgraphs
-├── hificnv_depth_bws
-├── hificnv_maf_bws
-├── hificnv_vcfs
-├── merged_haplotagged_bam
-├── paraphase_output_jsons
-├── paraphase_realigned_bams
-├── paraphase_vcfs
-├── read_length_summary
-├── read_quality_summary
-├── sample_hiphase_blocks
-├── sample_hiphase_haplotags
-├── sample_hiphase_stats
-├── sample_phased_small_variant_vcfs
-├── sample_phased_sv_vcfs
-├── small_variant_gvcfs
-├── small_variant_roh_bed
-├── small_variant_roh_out
-├── small_variant_vcf_stats
-├── trgt_dropouts
-├── trgt_repeat_vcf
-└── trgt_spanning_reads
-
-37 directories
-```
--->
