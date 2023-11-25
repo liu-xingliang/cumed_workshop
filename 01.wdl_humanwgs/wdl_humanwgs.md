@@ -1875,6 +1875,16 @@ slivar tsv \
 
 ## Running pipeline using miniwdl and Slurm
 
+Slurm has been installed on EC2 server:
+
+```bash
+sinfo --long --Node
+```
+
+|NODELIST|NODES|PARTITION|STATE|CPUS|S:C:T|MEMORY|TMP_DISK|WEIGHT|AVAIL_FE|REASON|
+|---|---|---|---|---|---|---|---|---|---|---|
+|localhost|1|compute*|idle|4|4:1:1|30000|0|1|(null)|none|
+
 ### Downloading the github repository for latest version of pipeline
 
 ```bash
@@ -2248,7 +2258,7 @@ image_cache = "$PWD/miniwdl_singularity_cache"
 extra_args="--partition compute --comment 'running with miniwdl on compute partition'"
 ```
 
-After that, initiate the execution using similar commands:
+After that, initiate the execution using similar commands (please do NOT run this on workshop server as it is for full dataset run requiring more cpus and memory than workshop server can offer):
 
 ```bash
 mkdir -p slurm_run
