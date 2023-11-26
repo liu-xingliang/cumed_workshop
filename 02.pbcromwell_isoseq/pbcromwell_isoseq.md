@@ -63,7 +63,7 @@ export SMRT_ROOT=/home/ubuntu/software/smrtlink
 ```
 
 <p align="center">
-<img src="./img/smrttools_only.svg" width="1000">
+<img src="./img/smrttools_only.png" width="1000">
 </p>
 
 In this hands-on session, we only need command line tools of SMRT Link. **Full SMRT Link has already been installed on workshop servers**.
