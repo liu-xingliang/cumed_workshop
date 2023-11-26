@@ -718,6 +718,19 @@ For more details, please refer to DV doc: [looking-through-deepvariants-eyes](ht
 
 To increase the level of parallelism, `make_examples` supports sharding of its input and output via the `--task` argument with a sharded output specification. Below is the `make_examples` commands used in the pipeline (of course, the number of shards and parallel jobs for a full Human WGS dataset, e.g., 30X dataset, will be larger and the pipeline does not need singularity shell for each command):
 
+DV was tuned to fit PacBio mode: `--norealign-reads`, `--alt-aligned-pileup diff_channels`, `--vsc-min-fraction-indels 0.12`
+
+* `--norealign_reads`: do not locally realign reads before calling variants. Reads longer than 500 bp are never realigned.
+* `--alt_aligned_pileup diff_channels`: include alignments of reads against each candidate alternate allele in the pileup image.
+* `--vsc_min_fraction_indels 0.12`: indel alleles occurring at least this fraction of all counts in the AlleleCount will be advanced as candidates (default is 0.06).
+
+Also, the following parameters enable haplotype sorting of PacBio HiFi reads to make a better decision whether a variant has a copy from one or both parents
+
+* `--add_hp_channel`: add another channel to represent HP tags per read.
+* `--sort_by_haplotypes`: sort reads based on their HP tags.
+* `--parse-sam-aux-fields`: auxiliary fields of the BAM/CRAM records are parsed. Needed by --sort-by-haplotypes by --add-hp-channel.
+* `--phase-reads`: calculate phases and add HP tag to all reads automatically.
+
 ```bash
 # gcr.io/deepvariant-docker/deepvariant:1.5.0
 # singularity pull deepvariant.sif docker://gcr.io/deepvariant-docker/deepvariant:1.5.0
@@ -757,7 +770,7 @@ time seq 0 15 | parallel --jobs 4 /opt/deepvariant/bin/make_examples \
 
 ###### call_variants (CPU only)
 
-`call_variants` consumes TFRecord file(s) of tf.Examples protos created by `make_examples` and a deep learning model checkpoint and evaluates the model on each example in the input TFRecord. The output here is a TFRecord of CallVariantsOutput protos. call_variants doesn't directly support sharding its outputs, but accepts a glob or shard-pattern for its inputs.
+`call_variants` consumes TFRecord file(s) of tf.Examples protos created by `make_examples` and a deep learning model checkpoint and evaluates the model on each example in the input TFRecord.
 
 _When using a GPU, call_variants is both faster, more efficient, and needs fewer CPUs. Based on a small number of experiments, currently **the most efficient configuration for call_variants on a GPU instance is 4-8 CPUs and 1 GPU**._
 (https://github.com/google/deepvariant/blob/r1.5/docs/deepvariant-details.md#call_variants)
@@ -766,6 +779,8 @@ This step also takes a while to run given slim computing resources available on 
 
 ```bash
 # use default deepvariant model: /opt/models/pacbio/model.ckpt if users don't provide their own ones
+
+# --checkpoint: path to the TensorFlow model checkpoint to use to evaluate candidate variant calls
 time /opt/deepvariant/bin/call_variants \
 	--outfile /mnt/out/call_deepvariant/HG002.GRCh38.call_variants_output.tfrecord.gz \
 	--examples "/mnt/out/call_deepvariant/example_tfrecords/HG002.examples.tfrecord@16.gz" \
@@ -778,7 +793,7 @@ time /opt/deepvariant/bin/call_variants \
 
 ###### postprocess_variants
 
-`postprocess_variants` is a single-threaded program, reads all of the output TFRecord files from call_variants, sorts them, combines multi-allelic records, and writes out a VCF file. When gVCF output is requested, **it also outputs a gVCF file which merges the VCF with the non-variant sites**.
+`postprocess_variants` is a single-threaded program, reads all of the output TFRecord files from call_variants, sorts them, combines multi-allelic records, and writes out a VCF file. gVCF including non-variant sites is also emitted when requested.
 
 ```bash
 time /opt/deepvariant/bin/postprocess_variants \

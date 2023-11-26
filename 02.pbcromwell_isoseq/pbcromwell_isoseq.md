@@ -512,6 +512,13 @@ After this step, Iso-Seq pipeline emit unique sequence for each full-length isof
 mkdir -p ~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_collapse
 cd ~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_collapse
 
+# --do-not-collapse-extra-5exons: do not collapse 5' shorter transcripts which miss one or multiple 5' exons
+
+# defaults:
+# --max-fuzzy-junction 5: ignore mismatches or indels shorter than or equal to 5
+# --min-aln-coverage 0.99: >= 99% of the query sequence length should be included in alignments against the sequence match (not too many soft/hard-clips).
+# --min-aln-identity 0.95
+
 time isoseq collapse \
     --log-level INFO \
     --alarms alarms.json \
@@ -888,8 +895,6 @@ For RT Switching (RT switching from one repat to the other in the RNA template, 
 <p align="center">
 <img src="./img/rt_switching.svg" width="1500">
 </p>
-
-For details of other filters, please check SQANTI3
 
 ## Executing Iso-Seq workflow using `pbcromwell`
 

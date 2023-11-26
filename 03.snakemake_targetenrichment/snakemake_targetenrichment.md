@@ -206,22 +206,28 @@ time pbsv call \
 
 ### 2. deepvariant
 
+DV was tuned to fit PacBio mode: `--norealign-reads`, `--alt-aligned-pileup diff_channels`, `--vsc-min-fraction-indels 0.12`
+
+* `--norealign_reads`: do not locally realign reads before calling variants. Reads longer than 500 bp are never realigned.
+* `--alt_aligned_pileup diff_channels`: include alignments of reads against each candidate alternate allele in the pileup image.
+* `--vsc_min_fraction_indels 0.12`: indel alleles occurring at least this fraction of all counts in the AlleleCount will be advanced as candidates (default is 0.06).
+
+Also, the following parameters enable haplotype sorting of PacBio HiFi reads to make a better decision whether a variant has a copy from one or both parents
+
+* `--add_hp_channel`: add another channel to represent HP tags per read.
+* `--sort_by_haplotypes`: sort reads based on their HP tags.
+* `--parse-sam-aux-fields`: auxiliary fields of the BAM/CRAM records are parsed. Needed by --sort-by-haplotypes by --add-hp-channel.
+* `--phase-reads`: calculate phases and add HP tag to all reads automatically.
+
 ```bash
 cd /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/hacked_run
 
 # gcr.io/deepvariant-docker/deepvariant:1.4.0
-singularity pull deepvariant.sif docker://gcr.io/deepvariant-docker/deepvariant:1.4.0
+# singularity pull deepvariant.sif docker://gcr.io/deepvariant-docker/deepvariant:1.4.0
 
 singularity shell deepvariant.sif
 
 mkdir -p deepvariant/examples
-# similar to WGS Variant Pipeline, use parallel to speed up DV make_examples
-
-# pipeline specific paramter:
-# --vsc_min_fraction_indels: Indel alleles occurring at least this fraction of
-#     all counts in our AlleleCount will be advanced as candidates.
-#     (default: '0.06')
-# pipeline value: 0.12
 
 # add --regions /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/cyp2d6.bed to confine the number of examples to target region: CYP2D6, this will speed up the process
 time seq 0 3 | parallel --jobs 4 /opt/deepvariant/bin/make_examples \
@@ -249,6 +255,7 @@ time seq 0 3 | parallel --jobs 4 /opt/deepvariant/bin/make_examples \
 # user	0m13.199s
 # sys	0m1.611s
 
+# --checkpoint: path to the TensorFlow model checkpoint to use to evaluate candidate variant calls
 time /opt/deepvariant/bin/call_variants \
 	--outfile deepvariant/NA02016.GRCh38_noalt.call_variants_output.tfrecord.gz \
 	--examples deepvariant/examples/NA02016.GRCh38_noalt.examples.tfrecord@4.gz \
@@ -420,7 +427,7 @@ time pangu -m capture -p pangu/NA02016/ ../snakemake_run/batches/CYP2D6_PGx_SQII
 ### 4. pharmcat
 
 ```bash
-singularity pull pharmcat.sif docker://pgkb/pharmcat:2.3.0
+# singularity pull pharmcat.sif docker://pgkb/pharmcat:2.3.0
 
 singularity shell pharmcat.sif
 
