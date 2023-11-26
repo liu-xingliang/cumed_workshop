@@ -62,7 +62,7 @@ export SMRT_ROOT=/home/ubuntu/software/smrtlink
 ./smrtlink-${VERSION}.run --rootdir $SMRT_ROOT --smrttools-only
 ```
 
-In this hands-on session, we only need command line tools of SMRT Link only.
+In this hands-on session, we only need command line tools of SMRT Link. **SMRT Link has already been installed on workshop servers**.
 
 ### Updating system `$PATH` 
 
@@ -77,7 +77,7 @@ export PATH=$SMRT_ROOT/install/smrtlink-release_13.0.0.203030/bundles/smrttools/
 
 ### Demultiplexing HiFi reads
 
-To increase the throughput of Kinnex kit, multiplexing is one on both Kinnex adapter level and cDNA primer level.
+To increase the throughput of Kinnex kit, multiplexing is done on both Kinnex adapter level (barcoded SMRTbell adapters) and cDNA primer level (barcoded cDNA primers).
 
 <p align="center">
 <img src="./img/Kinnex_demux_structure.svg" width="1500">
@@ -384,6 +384,8 @@ m84041_231023_043708_s4/251662239/ccs/12711_14772,+,6,5,28,2061,IsoSeqX_bc01_5p-
 
 Comparing to its predecessor, `isoseq cluster2` is a memory-efficient alternative supporting high-throughput input of Kinnex FL RNA sequencing.
 
+`isoseq cluster2` took ~10 mins to run on the demo dataset, therefore the result file: `transcripts.bam` has already been provided under: `~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2/`
+
 ```bash
 mkdir -p ~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2
 cd ~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2
@@ -396,6 +398,7 @@ time dataset consolidate \
 # user	0m36.037s
 # sys	0m5.781s
 
+# attendees could skip this step but using result file: transcripts.bam for next step
 time isoseq \
   cluster2 \
   --log-level INFO \
@@ -472,6 +475,9 @@ time python3 -m pbreports.report.isoseq \
 This step comes before `isoseq collapse` for collapsing multiple transcripts consensus derived from same isoform. `/home/ubuntu/CUMED_BFX_workshop/02.pbcromwell_isoseq/Human_hg38_Gencode_v39/` is the reference dataset comes together with SMRT Link (need to be installed).
 
 ```bash
+# still under folder of isoseq cluster2 
+cd ~/CUMED_BFX_workshop/02.pbcromwell_isoseq/hacked_run/call_isoseq_cluster2/
+
 time pbmm2 align \
     --sort \
     --min-gap-comp-id-perc 95.0 \
