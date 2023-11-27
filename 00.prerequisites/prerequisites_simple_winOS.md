@@ -67,6 +67,12 @@ vncserver -localhost -geometry 1600x1200
 
 Download [VNC-Viewer-7.8.0-Windows-64bit.exe](https://downloads.realvnc.com/download/file/viewer.files/VNC-Viewer-7.8.0-Windows-64bit.exe). 
 
+If it's the first time you run RealVNC, you would see a window below, please select "Using RealVNC Viewer without signing in" and continue.
+
+<p align="left">
+<img src="./img/firsttime_vnc.svg" width="400">
+</p>
+
 Open RealVNC and input "localhost:5901" in the address bar:
 
 <p align="left">
