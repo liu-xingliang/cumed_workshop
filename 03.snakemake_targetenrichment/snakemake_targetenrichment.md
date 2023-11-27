@@ -182,7 +182,7 @@ time pbsv discover \
     --hifi \
     --log-level INFO \
     --tandem-repeats /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/snakemake_run/workflow/aux/tandem_repeats.bed \
-    /home/ubuntu/cumed_bfx_workshop/03.snakemake_targetenrichment/data/pbmarkdup.grch38.sorted.bam/na02016.pbmarkdup.grch38.sorted.bam \
+    /home/ubuntu/CUMED_BFX_workshop/03.snakemake_targetenrichment/data/cyp2d6/downsampled/NA02016.pbmarkdup.GRCh38.sorted.bam \
     pbsv/svsig/NA02016.GRCh38_noalt.svsig.gz
 
 # real	0m0.192s
